@@ -1,0 +1,74 @@
+﻿<Window x:Class="Nimaime.SPD.MainWindow"
+				xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+				xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+				xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+				xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+				xmlns:local="clr-namespace:Nimaime.SPD"
+				xmlns:controls="clr-namespace:Nimaime.SPD.Controls"
+				mc:Ignorable="d"
+				Title="二枚目国药SPD系统帮助程序" Height="600" Width="900">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+		<Grid Grid.Row="0">
+			<Label Content="当前登录用户：未登录(双击此处登录)" HorizontalAlignment="Left" VerticalAlignment="Top" Name="lblLoginStatus" MouseDoubleClick="lblLoginStatus_MouseDoubleClick"/>
+			<Button Name="btnLogout" Content="注销" HorizontalAlignment="Right" Click="btnLogout_Click"/>
+			<Button Name="btnHISDBSetting" Content="HIS数据库设置" HorizontalAlignment="Right" Margin="0,0,36,0" Click="btnHISDBSetting_Click"/>
+		</Grid>
+		<Grid Grid.Row="1">
+			<TabControl Name="tabMain" SelectionChanged="MainTab_SelectionChanged">
+				<TabItem Header="基础数据">
+					<Grid Background="#FFE5E5E5">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="*"/>
+						</Grid.RowDefinitions>
+						<Grid Grid.Row="0">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="*"/>
+								<ColumnDefinition Width="Auto"/>
+							</Grid.ColumnDefinitions>
+							<StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
+								<Button Name="btnLoadMaterial" Content="加载耗材信息" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+								<Label Content="供应商：" Height="20" FontSize="8"/>
+								<controls:SearchableComboBox x:Name="cbProviderInMaterial" Width="240" VerticalAlignment="Top" StaysOpenOnEdit="True" Height="20" DisplayMemberPath="cname" SelectionChanged="cbProvider_SelectionChanged"/>
+							</StackPanel>
+							<Grid Grid.Column="1">
+								<WrapPanel/>
+							</Grid>
+							<Grid Grid.Column="2">
+								<Button Name="btnExportMaterialXLS" Content="导出全量耗材信息" HorizontalAlignment="Left" VerticalAlignment="Top" Click="btnExportMaterialXLS_Click"/>
+							</Grid>
+						</Grid>
+						<Grid Grid.Row="1">
+						</Grid>
+					</Grid>
+				</TabItem>
+				<TabItem Header="消耗查询">
+					<Grid Background="#FFE5E5E5"/>
+				</TabItem>
+				<TabItem Header="后勤物资">
+					<Grid Background="#FFE5E5E5">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="*"/>
+						</Grid.RowDefinitions>
+						<Grid Grid.Row="0">
+							<StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+								<StackPanel.Resources>
+									<Style TargetType="{x:Type Button}">
+										<Setter Property="Margin" Value="0,0,5,0"/>
+									</Style>
+								</StackPanel.Resources>
+								<Button Name="btnFetchDeptByImmRK" Content="后勤出入库报表补充退库科室" HorizontalAlignment="Left" VerticalAlignment="Top" Click="btnFetchDeptByImmRK_Click"/>
+							</StackPanel>
+						</Grid>
+					</Grid>
+				</TabItem>
+			</TabControl>
+		</Grid>
+	</Grid>
+</Window>
