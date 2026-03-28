@@ -139,11 +139,11 @@ namespace Nimaime.SPD
 		/// <summary>
 		/// HIS数据库用户名
 		/// </summary>
-		public string UserName { get; set; }
+		public string UserName { get; set; } = "";
 		/// <summary>
 		/// HIS数据库密码
 		/// </summary>
-		public string Password { get; set; }
+		public string Password { get; set; } = "";
 		/// <summary>
 		/// 当前选定的HIS数据库地址对象
 		/// </summary>
@@ -195,7 +195,14 @@ namespace Nimaime.SPD
 		private readonly string _filePath = filePath;
 		private readonly object _lock = new();
 
-		public Setting? Current { get; private set; }
+		public Setting Current { get; private set; } = new()
+		{
+			Account = "",
+			Password = "",
+			XUS = "",
+			XAuth = "",
+			LoginName = "",
+		};
 
 		/// <summary>
 		/// 加载配置（不存在则创建默认）

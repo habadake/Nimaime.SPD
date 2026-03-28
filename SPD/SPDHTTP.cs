@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Nimaime.SPD.Common;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Windows;
+using static Nimaime.SPD.Common.FileTypeDetect;
 
 namespace Nimaime.SPD.SPD
 {
@@ -76,9 +78,10 @@ namespace Nimaime.SPD.SPD
 		/// </summary>
 		/// <param name="path">API 路径</param>
 		/// <param name="jsonContent">JSON 内容</param>
+		/// <param name="fileType">文件类型（用于下载后检查）</param>
 		/// <param name="showError">是否弹窗报错</param>
 		/// <returns>文件字节内容</returns>
-		public async Task<byte[]> PostSPDWebAddrDL(string path, string jsonContent, bool showError = false)
+		public async Task<byte[]> PostSPDWebAddrDL(string path, string jsonContent, FileType fileType, bool showError = true)
 		{
 			try
 			{
@@ -86,6 +89,11 @@ namespace Nimaime.SPD.SPD
 				using HttpResponseMessage response = await httpClient.PostAsync(path, content);
 				response.EnsureSuccessStatusCode();
 				byte[] fileData = await response.Content.ReadAsByteArrayAsync();
+				if (!FileTypeDetect.IsFileType(fileData, fileType))
+				{
+					if (showError) MessageBox.Show($"下载的文件类型不正确，可能是接口返回了错误信息而不是文件。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+					return [];
+				}
 				return fileData;
 			}
 			catch (Exception ex)

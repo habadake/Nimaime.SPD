@@ -19,6 +19,11 @@ namespace Nimaime.SPD.SPD
 		public int version { get; set; }
 		public string hosId { get; set; }
 		public DateTime lastUpdateDateTime { get; set; }
+
+		public override string ToString()
+		{
+			return cname;
+		}
 	}
 
 	public class ApiResponse<T>

@@ -6,8 +6,19 @@
 				xmlns:local="clr-namespace:Nimaime.SPD"
 				xmlns:controls="clr-namespace:Nimaime.SPD.Controls"
 				mc:Ignorable="d"
-				Title="二枚目国药SPD系统帮助程序" Height="600" Width="900">
+				Title="二枚目国药SPD系统帮助程序" Height="720" Width="1280">
 	<Grid>
+		<Grid.Resources>
+			<Style TargetType="Label">
+				<Setter Property="Padding" Value="0"/>
+				<Setter Property="VerticalContentAlignment" Value="Center"/>
+				<Setter Property="Margin" Value="5,0,0,0"/>
+			</Style>
+			<Style TargetType="CheckBox">
+				<Setter Property="VerticalContentAlignment" Value="Center"/>
+				<Setter Property="Margin" Value="5,0,0,0"/>
+			</Style>
+		</Grid.Resources>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto"/>
 			<RowDefinition Height="*"/>
@@ -22,7 +33,7 @@
 				<TabItem Header="基础数据">
 					<Grid Background="#FFE5E5E5">
 						<Grid.RowDefinitions>
-							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="21"/>
 							<RowDefinition Height="*"/>
 						</Grid.RowDefinitions>
 						<Grid Grid.Row="0">
@@ -32,18 +43,51 @@
 								<ColumnDefinition Width="Auto"/>
 							</Grid.ColumnDefinitions>
 							<StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
-								<Button Name="btnLoadMaterial" Content="加载耗材信息" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-								<Label Content="供应商：" Height="20" FontSize="8"/>
-								<controls:SearchableComboBox x:Name="cbProviderInMaterial" Width="240" VerticalAlignment="Top" StaysOpenOnEdit="True" Height="20" DisplayMemberPath="cname" SelectionChanged="cbProvider_SelectionChanged"/>
+								<Label Content="关键词："/>
+								<TextBox x:Name="txtKeyword" Width="120"/>
+								<Label Content="供应商："/>
+								<controls:SearchableComboBox x:Name="cbProviderInMaterial" Width="240" VerticalAlignment="Top" DisplayMemberPath="cname" SelectionChanged="cbProvider_SelectionChanged"/>
+								<Label Content="厂家："/>
+								<TextBox x:Name="txtManufacturer" Width="160"/>
+								<CheckBox x:Name="chkIsMaterialEnabled" Content="是否激活" IsThreeState="True" IsChecked="True"/>
+								<CheckBox x:Name="chkIsMaterialProcurement" Content="是否采购" IsThreeState="True" IsChecked="{x:Null}"/>
+								<CheckBox x:Name="chkIsMaterialTemporaryProcurement" Content="是否临采" IsThreeState="True" IsChecked="{x:Null}"/>
+								<CheckBox x:Name="chkIsMaterialCharging" Content="是否收费" IsThreeState="True" IsChecked="{x:Null}"/>
+								<CheckBox x:Name="chkIsMaterialContract" Content="是否带量" IsThreeState="True" IsChecked="{x:Null}"/>
+								<Button Name="btnLoadMaterial" Content="加载" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,0,0,0" Click="btnLoadMaterial_Click"/>
+								<Button Name="btnExportMaterialWithPara" Content="导出" HorizontalAlignment="Left" VerticalAlignment="Top" Click="btnExportMaterialWithPara_Click" Margin="5,0,0,0"/>
 							</StackPanel>
 							<Grid Grid.Column="1">
 								<WrapPanel/>
 							</Grid>
 							<Grid Grid.Column="2">
-								<Button Name="btnExportMaterialXLS" Content="导出全量耗材信息" HorizontalAlignment="Left" VerticalAlignment="Top" Click="btnExportMaterialXLS_Click"/>
+								<Button Name="btnExportMaterialXLS" Content="导出全部耗材" HorizontalAlignment="Left" VerticalAlignment="Top" Click="btnExportMaterialXLS_Click"/>
 							</Grid>
 						</Grid>
 						<Grid Grid.Row="1">
+							<DataGrid x:Name="dgMaterial" AutoGenerateColumns="False" SelectionMode="Single" CanUserResizeRows="False" IsSynchronizedWithCurrentItem="False">
+								<DataGrid.Columns>
+									<DataGridTextColumn Header="ID" Binding="{Binding SPDID}" IsReadOnly="True"/>
+									<DataGridTextColumn Header="HIS编码" Binding="{Binding erpCode}" IsReadOnly="True"/>
+									<DataGridTextColumn Header="启停" Binding="{Binding flagStr}" IsReadOnly="True"/>
+									<DataGridTextColumn Header="采购状态" Binding="{Binding purchaseStatus}" IsReadOnly="True"/>
+									<DataGridTextColumn Header="名称" Binding="{Binding goodsName}" IsReadOnly="True"/>
+									<DataGridTextColumn Header="规格" Binding="{Binding goodsGg}" IsReadOnly="True"/>
+									<DataGridTextColumn Header="价格" Binding="{Binding price, StringFormat={}{0:F2}}" IsReadOnly="True"/>
+									<DataGridTextColumn Header="供应商" Binding="{Binding provName}" IsReadOnly="True"/>
+									<DataGridTextColumn Header="厂家" Binding="{Binding mfrsName}" IsReadOnly="True"/>
+									<DataGridTextColumn Header="类型" Binding="{Binding purType}" IsReadOnly="True"/>
+									<DataGridTextColumn Header="财务分类" Binding="{Binding hosKindName}" IsReadOnly="True"/>
+									<DataGridTextColumn Header="收费" Binding="{Binding isCharging}" IsReadOnly="True"/>
+									<DataGridTextColumn Header="带量" Binding="{Binding purchaseContract}" IsReadOnly="True"/>
+									<DataGridTextColumn Header="平台编码" Binding="{Binding hitCode}" IsReadOnly="True"/>
+									<DataGridTextColumn Header="医保编码" Binding="{Binding icdCode}" IsReadOnly="True"/>
+									<DataGridTextColumn Header="注册证号" Binding="{Binding certificateCode}" IsReadOnly="True"/>
+									<DataGridTextColumn Header="导入人" Binding="{Binding ename}" IsReadOnly="True"/>
+									<DataGridTextColumn Header="导入时间" Binding="{Binding fillDate, StringFormat=\{0:yyyy-MM-dd HH:mm:ss\}}" IsReadOnly="True"/>
+									<DataGridTextColumn Header="更新时间" Binding="{Binding lastUpdateDatetime, StringFormat=\{0:yyyy-MM-dd HH:mm:ss\}}" IsReadOnly="True"/>
+								</DataGrid.Columns>
+							</DataGrid>
 						</Grid>
 					</Grid>
 				</TabItem>

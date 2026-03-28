@@ -21,8 +21,7 @@ namespace Nimaime.SPD.Common
 			if (string.IsNullOrEmpty(str))
 				return default;
 
-			if (DateTime.TryParseExact(str, Format, CultureInfo.InvariantCulture,
-									   DateTimeStyles.None, out var dt))
+			if (DateTime.TryParseExact(str, Format, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt))
 			{
 				return dt;
 			}

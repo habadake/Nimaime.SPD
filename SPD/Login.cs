@@ -10,9 +10,9 @@ namespace Nimaime.SPD.SPD
 {
 	public class LoginResult
 	{
-		public string XUS { get; set; }
-		public string XAuthority { get; set; }
-		public string UserName { get; set; }
+		public string XUS { get; set; } = "";
+		public string XAuthority { get; set; } = "";
+		public string UserName { get; set; } = "";
 	}
 
 	public class LoginService
@@ -53,8 +53,8 @@ namespace Nimaime.SPD.SPD
 
 				var data = checkDoc.RootElement.GetProperty("data");
 
-				string salt = data.GetProperty("salt").GetString();
-				string randomCode = data.GetProperty("randomCode").GetString();
+				string salt = data.GetProperty("salt").GetString() ?? "";
+				string randomCode = data.GetProperty("randomCode").GetString() ?? "";
 
 				if (string.IsNullOrEmpty(salt))
 					MessageBox.Show("获取登录参数失败，请检查用户名是否正确");
@@ -92,13 +92,13 @@ namespace Nimaime.SPD.SPD
 
 				if (loginDoc.RootElement.GetProperty("code").GetInt32() < 0)
 				{
-					string msg = loginDoc.RootElement.GetProperty("msg").GetString();
+					string msg = loginDoc.RootElement.GetProperty("msg").GetString() ?? "";
 					MessageBox.Show(msg);
 					return null;
 				}
 
 				// Step 4: 生成 X-US 和 X-AUTHORITY
-				string xus = loginDoc.RootElement.GetProperty("tag").GetString();
+				string xus = loginDoc.RootElement.GetProperty("tag").GetString() ?? "";
 				string xAuthority = GetXAuthority("");
 				string loginUser = loginDoc.RootElement.GetProperty("data").GetProperty("ename").ToString();
 

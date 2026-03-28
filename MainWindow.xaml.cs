@@ -6,11 +6,14 @@ using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System.Data;
 using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Threading;
+using static ICSharpCode.SharpZipLib.Zip.ExtendedUnixData;
+using static Nimaime.SPD.SPD.MaterialMethods;
 
 namespace Nimaime.SPD
 {
@@ -23,6 +26,9 @@ namespace Nimaime.SPD
 		public MainWindow()
 		{
 			InitializeComponent();
+			string programTitle = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyDescriptionAttribute>()?.Description ?? "二枚目国药SPD系统帮助程序";
+			//获取版本号
+			Title = programTitle + " " + Assembly.GetExecutingAssembly().GetName().Version?.ToString();
 			config.Load();
 			if (string.IsNullOrEmpty(config.Current.LoginName))
 			{
@@ -66,7 +72,6 @@ namespace Nimaime.SPD
 			if (!string.IsNullOrEmpty(config.Current.LoginName))
 			{
 				UpdateLBL();
-				LoadProviderToCB();
 			}
 		}
 
@@ -99,6 +104,7 @@ namespace Nimaime.SPD
 				$"X-AUTH：{config.Current.XAuth}\n" +
 				$"SERVER：{config.Current.SelectedSPDWebAddr}\n" +
 				$"上次登录时间：{config.Current.LastLoginTime:yyyy-MM-dd HH:mm:ss}";
+			LoadProviderToCB();
 		}
 
 		/// <summary>
@@ -150,6 +156,66 @@ namespace Nimaime.SPD
 		#endregion
 
 		#region TAB 01 耗材管理
+
+		private async void btnLoadMaterial_Click(object sender, RoutedEventArgs e)
+		{
+			btnLoadMaterial.IsEnabled = false;
+			SPDMaterialParameter para = GenMaterialParaByUI();
+			List<Material> materials = await MaterialMethods.GetSPDMaterialList(para);
+			// TODO 打表
+			dgMaterial.ItemsSource = materials;
+			btnLoadMaterial.IsEnabled = true;
+		}
+
+		/// <summary>
+		/// 导出耗材（带参数）按钮
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private async void btnExportMaterialWithPara_Click(object sender, RoutedEventArgs e)
+		{
+			btnExportMaterialWithPara.IsEnabled = false;
+			SaveFileDialog saveFileDialog = new()
+			{
+				Title = "保存SPD物资信息",
+				Filter = "Excel 97-2003 工作簿 (*.xls)|*.xls",
+				FileName = $"医院商品导出表{DateTime.Now:yyyy-MM-dd}.xls"
+			};
+			if (saveFileDialog.ShowDialog() != true)
+			{
+				btnExportMaterialWithPara.IsEnabled = true;
+				return;
+			}
+			SPDMaterialParameter exPara = GenMaterialParaByUI();
+			// 下载报表文件
+			bool result = await MaterialMethods.ExportSPDMaterialWithPara(saveFileDialog.FileName, exPara);
+			if (result)
+			{
+				System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+				{
+					FileName = saveFileDialog.FileName,
+					UseShellExecute = true
+				});
+			}
+			btnExportMaterialWithPara.IsEnabled = true;
+		}
+
+		private SPDMaterialParameter GenMaterialParaByUI()
+		{
+			SPDMaterialParameter para = new()
+			{
+				goodsName = !string.IsNullOrWhiteSpace(txtKeyword.Text) ? txtKeyword.Text.Trim() : "",
+				provId = cbProviderInMaterial.SelectedValue is Provider selectedProvider ? selectedProvider.provId : "",
+				mfrsName = !string.IsNullOrWhiteSpace(txtManufacturer.Text) ? txtManufacturer.Text.Trim() : "",
+				flag = chkIsMaterialEnabled.IsChecked == true ? "1" : chkIsMaterialEnabled.IsChecked == false ? "0" : "",
+				canPurchase = chkIsMaterialProcurement.IsChecked == true ? "1" : chkIsMaterialProcurement.IsChecked == false ? "0" : "",
+				tempPurchase = chkIsMaterialTemporaryProcurement.IsChecked == true ? "1" : chkIsMaterialTemporaryProcurement.IsChecked == false ? "0" : "",
+				charging = chkIsMaterialCharging.IsChecked == true ? "1" : chkIsMaterialCharging.IsChecked == false ? "0" : "",
+				purchaseContract = chkIsMaterialContract.IsChecked == true ? "1" : chkIsMaterialContract.IsChecked == false ? "2" : "",
+			};
+			return para;
+		}
+
 		/// <summary>
 		/// 导出耗材按钮
 		/// </summary>
@@ -198,22 +264,28 @@ namespace Nimaime.SPD
 				btnExportMaterialXLS.IsEnabled = true;
 				return;
 			}
-			string filePathEnabled = Path.Combine(Path.GetDirectoryName(saveFileDialog.FileName), Path.GetFileNameWithoutExtension(saveFileDialog.FileName) + "_启用" + Path.GetExtension(saveFileDialog.FileName));
-			string filePathDisabled = Path.Combine(Path.GetDirectoryName(saveFileDialog.FileName), Path.GetFileNameWithoutExtension(saveFileDialog.FileName) + "_停用" + Path.GetExtension(saveFileDialog.FileName));
-			string filePathCombined = Path.Combine(Path.GetDirectoryName(saveFileDialog.FileName), Path.GetFileNameWithoutExtension(saveFileDialog.FileName) + "_全量" + ".xlsx");
-			try
+			string fileDic = Path.GetDirectoryName(saveFileDialog.FileName) ?? "";
+			if (!Path.Exists(fileDic))
 			{
-				await MaterialMethods.ExportSPDMaterial(filePathEnabled, "1");
-				if (exportDisabled)
-				{
-					await MaterialMethods.ExportSPDMaterial(filePathDisabled, "0");
-				}
+				btnExportMaterialXLS.IsEnabled = true;
+				return;
 			}
-			catch (Exception ex)
+			string fileNameWithoutExt = Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
+			string filePathEnabled = Path.Combine(fileDic, fileNameWithoutExt + "_启用" + Path.GetExtension(saveFileDialog.FileName));
+			string filePathDisabled = Path.Combine(fileDic, fileNameWithoutExt + "_停用" + Path.GetExtension(saveFileDialog.FileName));
+			string filePathCombined = Path.Combine(fileDic, fileNameWithoutExt + "_全量" + ".xlsx");
+			SPDMaterialParameter parameter = new()
 			{
-				MessageBox.Show($"导出失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+				flag = "1",
+			};
+			bool result1 = await MaterialMethods.ExportSPDMaterialWithPara(filePathEnabled, parameter);
+			bool result2 = false;
+			if (exportDisabled)
+			{
+				parameter.flag = "0";
+				result2 = await MaterialMethods.ExportSPDMaterialWithPara(filePathDisabled, parameter);
 			}
-			if (combine)
+			if (result1 && result2 && combine)
 			{
 				// 合并两个Excel 新增一列是否启用
 				MergeExcel(filePathEnabled, filePathDisabled, filePathCombined);
@@ -228,7 +300,10 @@ namespace Nimaime.SPD
 					// 无论如何都不影响合并文件的使用体验，所以即使删除失败也不提示用户了
 				}
 			}
-			MessageBox.Show($"导出成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+			if (result1 && (result2 || !combine))
+			{
+				MessageBox.Show($"导出成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+			}
 			btnExportMaterialXLS.IsEnabled = true;
 		}
 
@@ -396,8 +471,8 @@ namespace Nimaime.SPD
 					var row = sheet.GetRow(i);
 					if (row == null) continue;
 
-					string rkID = row.GetCell(col单号)?.ToString();
-					string type = row.GetCell(col类型)?.ToString();
+					string rkID = row.GetCell(col单号)?.ToString() ?? "";
+					string type = row.GetCell(col类型)?.ToString() ?? "";
 					if (string.IsNullOrWhiteSpace(rkID)) continue;
 					if (!rkID.StartsWith("RK")) continue;
 					if (type != "退还入库") continue;
@@ -408,7 +483,7 @@ namespace Nimaime.SPD
 						ICell cellName = row.GetCell(col科室) ?? row.CreateCell(col科室);
 						cellName.SetCellValue(deptName ?? "");
 					}
-					catch (Exception ex)
+					catch (Exception)
 					{
 						// 单行失败不中断
 						row.CreateCell(col科室).SetCellValue("获取失败");

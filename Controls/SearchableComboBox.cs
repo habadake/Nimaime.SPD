@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -32,6 +33,8 @@ namespace Nimaime.SPD.Controls
 			IsTextSearchEnabled = false;
 			StaysOpenOnEdit = true;
 
+			//DefaultStyleKeyProperty.OverrideMetadata(typeof(SearchableComboBox), new FrameworkPropertyMetadata(typeof(SearchableComboBox)));
+			PresentationTraceSources.DataBindingSource.Switch.Level = SourceLevels.Critical;
 			Loaded += (s, e) => InitCollectionView();
 		}
 
@@ -74,7 +77,6 @@ namespace Nimaime.SPD.Controls
 		}
 
 		#endregion
-
 		private void EditableTextBox_TextChanged(object sender, TextChangedEventArgs e)
 		{
 			if (_editableTextBox != null)
@@ -83,10 +85,10 @@ namespace Nimaime.SPD.Controls
 				var text = _editableTextBox.Text;
 
 				// 🚨 关键：暂时解除 SelectionChanged 影响
-				if (SelectedItem != null)
-				{
-					SelectedItem = null;
-				}
+				//if (SelectedItem != null)
+				//{
+				//	SelectedItem = null;
+				//}
 
 				// 更新搜索文本
 				SearchText = text;
@@ -112,7 +114,7 @@ namespace Nimaime.SPD.Controls
 				// 🚨 输入过程中，不允许自动选中
 				if (!string.IsNullOrEmpty(SearchText))
 				{
-					SelectedItem = null;
+					SetCurrentValue(SelectedItemProperty, null);
 					return;
 				}
 
