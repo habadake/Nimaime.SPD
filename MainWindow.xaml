@@ -92,7 +92,26 @@
 					</Grid>
 				</TabItem>
 				<TabItem Header="消耗查询">
-					<Grid Background="#FFE5E5E5"/>
+					<Grid Background="#FFE5E5E5">
+						<TabControl Name="tabConsume">
+							<TabItem Header="高值追溯">
+								<Grid Background="#FFE5E5E5">
+									<Grid.RowDefinitions>
+										<RowDefinition Height="Auto"/>
+										<RowDefinition Height="*"/>
+									</Grid.RowDefinitions>
+									<Grid Grid.Row="0">
+										<StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+											<Label Content="唯一码："/>
+											<TextBox x:Name="txtEPC" Width="128"/>
+											<Button Name="btnTrackEPC" Content="查询" Margin="5,0,0,0" Click="btnTrackEPC_Click"/>
+										</StackPanel>
+									</Grid>
+								</Grid>
+							</TabItem>
+						</TabControl>
+						
+					</Grid>
 				</TabItem>
 				<TabItem Header="后勤物资">
 					<Grid Background="#FFE5E5E5">

@@ -44,17 +44,12 @@ namespace Nimaime.SPD.SPD
 		{
 			SPDHTTP spdHTTP = new();
 			string strResponse = await spdHTTP.PostSPDWebAddr("spdHERPService/myInfo/provHosInfo/getHosCollectorList", "{\"hosId\": \"h00a2\"}");
-			JsonSerializerOptions jsoptions = new()
-			{
-				PropertyNameCaseInsensitive = true,
-			};
-			jsoptions.Converters.Add(new DateTimeConverter());
 			if (string.IsNullOrEmpty(strResponse))
 			{
 				return [];
 			}
 			// 反序列化为带壳结构
-			ApiResponse<List<Provider>>? result = JsonSerializer.Deserialize<ApiResponse<List<Provider>>>(strResponse, options: jsoptions);
+			ApiResponse<List<Provider>>? result = JsonSerializer.Deserialize<ApiResponse<List<Provider>>>(strResponse, JSOptionConverterMaker.Option);
 
 			// 判空 + 返回
 			return result?.data ?? new List<Provider>();

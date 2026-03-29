@@ -230,13 +230,7 @@ namespace Nimaime.SPD.SPD
 					json
 				);
 
-				JsonSerializerOptions jsoptions = new()
-				{
-					PropertyNameCaseInsensitive = true,
-				};
-				jsoptions.Converters.Add(new DateTimeConverter());
-
-				ApiResponse<PagedResult<Material>>? result = JsonSerializer.Deserialize<ApiResponse<PagedResult<Material>>>(response, jsoptions);
+				ApiResponse<PagedResult<Material>>? result = JsonSerializer.Deserialize<ApiResponse<PagedResult<Material>>>(response, JSOptionConverterMaker.Option);
 
 				return result?.data?.data ?? [];
 			}

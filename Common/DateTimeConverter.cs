@@ -35,4 +35,12 @@ namespace Nimaime.SPD.Common
 			writer.WriteStringValue(value.ToString(Format));
 		}
 	}
+
+	public static class JSOptionConverterMaker
+	{
+		public readonly static JsonSerializerOptions Option = new()
+		{
+			PropertyNameCaseInsensitive = true,
+		};
+	}
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using Nimaime.SPD.Common;
 using Nimaime.SPD.HIS;
 using Nimaime.SPD.SPD;
 using NPOI.HSSF.UserModel;
@@ -13,6 +14,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Threading;
 using static ICSharpCode.SharpZipLib.Zip.ExtendedUnixData;
+using static Nimaime.SPD.SPD.ConsumeMethods.EPC;
 using static Nimaime.SPD.SPD.MaterialMethods;
 
 namespace Nimaime.SPD
@@ -26,6 +28,7 @@ namespace Nimaime.SPD
 		public MainWindow()
 		{
 			InitializeComponent();
+			JSOptionConverterMaker.Option.Converters.Add(new DateTimeConverter());
 			string programTitle = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyDescriptionAttribute>()?.Description ?? "二枚目国药SPD系统帮助程序";
 			//获取版本号
 			Title = programTitle + " " + Assembly.GetExecutingAssembly().GetName().Version?.ToString();
@@ -399,6 +402,52 @@ namespace Nimaime.SPD
 		{
 			e.Handled = true;
 		}
+		#endregion
+
+		#region TAB 02 消耗查询
+		#region TAB 02-01 EPC 追溯
+		private async void btnTrackEPC_Click(object sender, RoutedEventArgs e)
+		{
+			string epc = txtEPC.Text;
+			if (!epc.ToUpper().StartsWith('E'))
+			{
+				MessageBox.Show("输入的唯一码格式有误！", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+				return;
+			}
+			btnTrackEPC.IsEnabled = false;
+			EPCTrackData? data = await ConsumeMethods.EPC.TrackEPC(epc);
+			btnTrackEPC.IsEnabled = true;
+			if (data == null)
+			{
+				return;
+			}
+			string msgBoxTitle = $"{data.UseStatus}";
+			if (data.UseDate != null)
+			{
+				msgBoxTitle += $" {data.JfDeptName} [{data.PatientId}]{data.PatientName} {data.UseDate:yyyy-MM-dd HH:mm}";
+			}
+			string msgBoxContent =
+				$"{epc}\n" +
+				$"ID：{data.GoodsId.Split('-')[1]} " +
+				$"{data.GoodsName}\n" +
+				$"型号：{data.GoodsGg}\n" +
+				$"批号：{data.BatchCode}\n" +
+				$"配送单：{data.BatchId}\n" +
+				$"供应商名称：{data.ProvName}\n" +
+				$"生产厂商名称：{data.MfrsName}\n" +
+				$"库存科室：{data.KcDeptName}\n" +
+				$"注册证：{data.CertificateCode}\n\n";
+			if (data.TraceablityNodes != null && data.TraceablityNodes.Count > 0)
+			{
+				msgBoxContent += "追溯信息：\n";
+				foreach (var node in data.TraceablityNodes)
+				{
+					msgBoxContent += $"-【{node.InType}】 {node.FillDate:yyyy-MM-dd HH:mm:ss}\n  {node.OutOrgName + node.OutDeptName} ➡️ {node.InDeptName} \n  制单：{node.FillerName} 审核：{node.Auditor}\n\n";
+				}
+			}
+			MessageBox.Show(msgBoxContent, msgBoxTitle, MessageBoxButton.OK, MessageBoxImage.Information);
+		}
+		#endregion
 		#endregion
 
 		#region TAB 03 后勤物资
