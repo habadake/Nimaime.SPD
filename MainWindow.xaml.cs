@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using Nimaime.Helper.File;
 using Nimaime.SPD.Common;
 using Nimaime.SPD.HIS;
 using Nimaime.SPD.SPD;
@@ -6,6 +7,7 @@ using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Windows;
@@ -28,7 +30,17 @@ namespace Nimaime.SPD
 		public MainWindow()
 		{
 			InitializeComponent();
+			CultureInfo culture = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+
+			culture.DateTimeFormat.ShortDatePattern = "yyyy-MM-dd";
+			culture.DateTimeFormat.LongTimePattern = "HH:mm:ss";
+			culture.DateTimeFormat.FullDateTimePattern = "yyyy-MM-dd HH:mm:ss";
+
+			CultureInfo.DefaultThreadCurrentCulture = culture;
+			CultureInfo.DefaultThreadCurrentUICulture = culture;
+
 			JSOptionConverterMaker.Option.Converters.Add(new DateTimeConverter());
+
 			string programTitle = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyDescriptionAttribute>()?.Description ?? "二枚目国药SPD系统帮助程序";
 			//获取版本号
 			Title = programTitle + " " + Assembly.GetExecutingAssembly().GetName().Version?.ToString();
@@ -159,7 +171,11 @@ namespace Nimaime.SPD
 		#endregion
 
 		#region TAB 01 耗材管理
-
+		/// <summary>
+		/// 加载耗材信息到UI DataGrid
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private async void btnLoadMaterial_Click(object sender, RoutedEventArgs e)
 		{
 			btnLoadMaterial.IsEnabled = false;
@@ -203,6 +219,10 @@ namespace Nimaime.SPD
 			btnExportMaterialWithPara.IsEnabled = true;
 		}
 
+		/// <summary>
+		/// 设置查询参数
+		/// </summary>
+		/// <returns></returns>
 		private SPDMaterialParameter GenMaterialParaByUI()
 		{
 			SPDMaterialParameter para = new()
@@ -406,6 +426,11 @@ namespace Nimaime.SPD
 
 		#region TAB 02 消耗查询
 		#region TAB 02-01 EPC 追溯
+		/// <summary>
+		/// 单个EPC输入追溯
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private async void btnTrackEPC_Click(object sender, RoutedEventArgs e)
 		{
 			string epc = txtEPC.Text;
@@ -419,6 +444,7 @@ namespace Nimaime.SPD
 			btnTrackEPC.IsEnabled = true;
 			if (data == null)
 			{
+				MessageBox.Show("查询时出错，请检查网络连接！", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
 				return;
 			}
 			string msgBoxTitle = $"{data.UseStatus}";
@@ -442,10 +468,109 @@ namespace Nimaime.SPD
 				msgBoxContent += "追溯信息：\n";
 				foreach (var node in data.TraceablityNodes)
 				{
-					msgBoxContent += $"-【{node.InType}】 {node.FillDate:yyyy-MM-dd HH:mm:ss}\n  {node.OutOrgName + node.OutDeptName} ➡️ {node.InDeptName} \n  制单：{node.FillerName} 审核：{node.Auditor}\n\n";
+					msgBoxContent += $"-【{node.InType}】 {node.FillDate:yyyy-MM-dd HH:mm:ss}\n  {node.OutOrgName + node.OutDeptName} → {node.InDeptName} \n  制单：{node.FillerName} 审核：{node.Auditor}\n\n";
 				}
 			}
 			MessageBox.Show(msgBoxContent, msgBoxTitle, MessageBoxButton.OK, MessageBoxImage.Information);
+		}
+
+		/// <summary>
+		/// 读取Excel表格批量查询
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private async void btnTrackEPCByExcel_Click(object sender, RoutedEventArgs e)
+		{
+			// 读取用户Excel文件
+			OpenFileDialog openFileDialog = new()
+			{
+				Filter = "Excel 工作簿 (*.xlsx)|*.xlsx|Excel 97-2003 工作簿 (*.xls)|*.xls",
+				Title = "请选择需追溯的EPC报表文件，表格需包含列名为【唯一码】或【EPC】的列"
+			};
+			if (openFileDialog.ShowDialog() != true)
+			{
+				return;
+			}
+			string filePath2Trace = openFileDialog.FileName;
+			if (!File.Exists(filePath2Trace))
+			{
+				MessageBox.Show("尝试打开的文件不存在！", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+				return;
+			}
+			btnTrackEPCByExcel.IsEnabled = false;
+			DataSet ds = ExcelHelper.Excel2DataSet(filePath2Trace) ?? new();
+			foreach (DataTable dt in ds.Tables)
+			{
+				string workingColumn = string.Empty;
+				if (dt.Columns.Contains("EPC"))
+				{
+					workingColumn = "EPC";
+				}
+				if (dt.Columns.Contains("唯一码"))
+				{
+					workingColumn = "唯一码";
+				}
+				if (workingColumn == string.Empty)
+				{
+					MessageBox.Show("未找到列名为【唯一码】或【EPC】的列！", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+					btnTrackEPCByExcel.IsEnabled = true;
+					return;
+				}
+				dt.Columns.Add("消耗状态", typeof(string));
+				dt.Columns.Add("库存科室", typeof(string));
+				dt.Columns.Add("计费科室", typeof(string));
+				dt.Columns.Add("病案号", typeof(string));
+				dt.Columns.Add("病人姓名", typeof(string));
+				dt.Columns.Add("使用时间", typeof(string));
+
+				string buttonTip;
+				int idx_row = 0;
+				foreach (DataRow row in dt.Rows)
+				{
+					buttonTip = $"表[{dt.TableName}]正在处理第{++idx_row}个，共{dt.Rows.Count}个";
+					btnTrackEPCByExcel.Content = buttonTip;
+					string epc = (row[workingColumn].ToString() ?? "").ToUpper();
+					if (!epc.StartsWith('E') || epc.Length != 16)
+					{
+						continue;
+					}
+					EPCTrackData? data = await ConsumeMethods.EPC.TrackEPC(epc);
+					if (data == null)
+					{
+						row["消耗状态"] = "查询失败";
+						continue;
+					}
+					row["消耗状态"] = data.UseStatus;
+					row["库存科室"] = data.KcDeptName;
+					row["计费科室"] = data.JfDeptName;
+					row["病案号"] = data.PatientId;
+					row["病人姓名"] = data.PatientName;
+					row["使用时间"] = data.UseDate?.ToString() ?? "";
+				}
+			}
+
+			btnTrackEPCByExcel.Content = "表格批量查询";
+			btnTrackEPCByExcel.IsEnabled = true;
+
+			SaveFileDialog saveFileDialog = new()
+			{
+				Title = "保存追溯结果",
+				Filter = "Excel 工作簿 (*.xlsx)|*.xlsx",
+				FileName = $"EPC追溯结果_{Path.GetFileNameWithoutExtension(filePath2Trace)}_{DateTime.Now:yyyy-MM-dd}.xlsx"
+			};
+
+			if (saveFileDialog.ShowDialog() != true)
+			{
+				return;
+			}
+
+			string file2Save = saveFileDialog.FileName;
+			ExcelHelper.SaveDataSet2Excel(ds, file2Save);
+			System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+			{
+				FileName = file2Save,
+				UseShellExecute = true
+			});
 		}
 		#endregion
 		#endregion
@@ -464,14 +589,13 @@ namespace Nimaime.SPD
 				Filter = "Excel 工作簿 (*.xlsx)|*.xlsx|Excel 97-2003 工作簿 (*.xls)|*.xls",
 				Title = "请选择后勤出入库报表文件"
 			};
-			string filePath = "";
 			btnFetchDeptByImmRK.IsEnabled = false;
 			if (openFileDialog.ShowDialog() != true)
 			{
 				btnFetchDeptByImmRK.IsEnabled = true;
 				return;
 			}
-			filePath = openFileDialog.FileName;
+			string filePath = openFileDialog.FileName;
 			if (!File.Exists(filePath))
 			{
 				btnFetchDeptByImmRK.IsEnabled = true;
@@ -481,9 +605,9 @@ namespace Nimaime.SPD
 			try
 			{
 				IWorkbook workbook;
-				using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+				using (var fs = new FileStream("", FileMode.Open, FileAccess.Read))
 				{
-					if (filePath.EndsWith(".xls"))
+					if ("".EndsWith(".xls"))
 						workbook = new HSSFWorkbook(fs);
 					else
 						workbook = new XSSFWorkbook(fs);

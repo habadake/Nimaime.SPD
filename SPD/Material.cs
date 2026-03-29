@@ -4,7 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
 using static Microsoft.IO.RecyclableMemoryStreamManager;
-using static Nimaime.SPD.Common.FileTypeDetect;
+using static Nimaime.Helper.File.CommonFileHelper;
 
 namespace Nimaime.SPD.SPD
 {

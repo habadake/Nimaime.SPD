@@ -52,7 +52,7 @@ namespace Nimaime.SPD.SPD
 			ApiResponse<List<Provider>>? result = JsonSerializer.Deserialize<ApiResponse<List<Provider>>>(strResponse, JSOptionConverterMaker.Option);
 
 			// 判空 + 返回
-			return result?.data ?? new List<Provider>();
+			return result?.data ?? [];
 		}
 	}
 }

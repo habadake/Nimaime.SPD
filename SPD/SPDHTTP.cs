@@ -1,10 +1,11 @@
-﻿using Nimaime.SPD.Common;
+﻿using Nimaime.Helper.File;
+using Nimaime.SPD.Common;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Windows;
-using static Nimaime.SPD.Common.FileTypeDetect;
+using static Nimaime.Helper.File.CommonFileHelper;
 
 namespace Nimaime.SPD.SPD
 {
@@ -37,15 +38,40 @@ namespace Nimaime.SPD.SPD
 		{
 			try
 			{
-				using HttpResponseMessage response = await httpClient.GetAsync(path);
-				response.EnsureSuccessStatusCode();
-				string strResponse = await response.Content.ReadAsStringAsync();
-				return strResponse;
+				byte[] bytes = await GetSPDWebAddrDL(path, FileType.OTHER, showError);
+				return Encoding.UTF8.GetString(bytes);
 			}
 			catch (Exception ex)
 			{
 				if (showError) MessageBox.Show($"请求SPD接口失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
 				return "";
+			}
+		}
+
+		/// <summary>
+		/// 向 SPD 服务器发起GET请求下载文件
+		/// </summary>
+		/// <param name="path">API 路径</param>
+		/// <param name="showError">是否弹窗报错</param>
+		/// <returns>响应结果</returns>
+		public async Task<byte[]> GetSPDWebAddrDL(string path, FileType fileType, bool showError = false)
+		{
+			try
+			{
+				using HttpResponseMessage response = await httpClient.GetAsync(path);
+				response.EnsureSuccessStatusCode();
+				byte[] fileData = await response.Content.ReadAsByteArrayAsync();
+				if (!CommonFileHelper.IsFileType(fileData, fileType))
+				{
+					if (showError) MessageBox.Show($"下载的文件类型不正确，可能是接口返回了错误信息而不是文件。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+					return [];
+				}
+				return fileData;
+			}
+			catch (Exception ex)
+			{
+				if (showError) MessageBox.Show($"请求SPD接口失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+				return [];
 			}
 		}
 
@@ -60,11 +86,8 @@ namespace Nimaime.SPD.SPD
 		{
 			try
 			{
-				using StringContent content = new(jsonContent, Encoding.UTF8, "application/json");
-				using HttpResponseMessage response = await httpClient.PostAsync(path, content);
-				response.EnsureSuccessStatusCode();
-				string strResponse = await response.Content.ReadAsStringAsync();
-				return strResponse;
+				byte[] bytes = await PostSPDWebAddrDL(path, jsonContent, FileType.OTHER, showError);
+				return Encoding.UTF8.GetString(bytes);
 			}
 			catch (Exception ex)
 			{
@@ -74,11 +97,11 @@ namespace Nimaime.SPD.SPD
 		}
 
 		/// <summary>
-		/// 向 SPD 服务器发起POST请求，获取字节流（用于下载文件）
+		/// 向 SPD 服务器发起POST请求，获取字节流
 		/// </summary>
 		/// <param name="path">API 路径</param>
 		/// <param name="jsonContent">JSON 内容</param>
-		/// <param name="fileType">文件类型（用于下载后检查）</param>
+		/// <param name="fileType">文件类型（用于下载后检查）设置为OTHER可跳过</param>
 		/// <param name="showError">是否弹窗报错</param>
 		/// <returns>文件字节内容</returns>
 		public async Task<byte[]> PostSPDWebAddrDL(string path, string jsonContent, FileType fileType, bool showError = true)
@@ -89,7 +112,7 @@ namespace Nimaime.SPD.SPD
 				using HttpResponseMessage response = await httpClient.PostAsync(path, content);
 				response.EnsureSuccessStatusCode();
 				byte[] fileData = await response.Content.ReadAsByteArrayAsync();
-				if (!FileTypeDetect.IsFileType(fileData, fileType))
+				if (!CommonFileHelper.IsFileType(fileData, fileType))
 				{
 					if (showError) MessageBox.Show($"下载的文件类型不正确，可能是接口返回了错误信息而不是文件。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
 					return [];

@@ -2,15 +2,24 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows10.0.17763.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <Platforms>x64</Platforms>
     <ApplicationIcon>gyqx_favicon.ico</ApplicationIcon>
     <AssemblyTitle>二枚目国药SPD系统帮助程序</AssemblyTitle>
-    <AssemblyVersion>0.2.31.9584</AssemblyVersion>
-    <FileVersion>0.2.31.9584</FileVersion>
+    <AssemblyVersion>0.2.45.9584</AssemblyVersion>
+    <FileVersion>0.2.45.9584</FileVersion>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,6 +29,12 @@
   <ItemGroup>
     <PackageReference Include="NPOI" Version="2.7.6" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.26.100" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nimaime.Helper.Data\Nimaime.Helper.Data.csproj" />
+    <ProjectReference Include="..\Nimaime.Helper.File\Nimaime.Helper.File.csproj" />
   </ItemGroup>
 
 </Project>

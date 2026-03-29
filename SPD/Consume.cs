@@ -23,7 +23,7 @@ namespace Nimaime.SPD.SPD
 					return null;
 				}
 				SPDHTTP client = new();
-				string result = await client.GetSPDWebAddr($"/spdHERPService/stockPile/epcTracability?epc={epc}", true);
+				string result = await client.GetSPDWebAddr($"/spdHERPService/stockPile/epcTracability?epc={epc}");
 				if (string.IsNullOrWhiteSpace(result))
 				{
 					return null;
