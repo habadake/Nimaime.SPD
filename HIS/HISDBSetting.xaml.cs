@@ -50,8 +50,8 @@ namespace Nimaime.SPD.HIS
 			}
 		}
 
-        private void BtnSave_Click(object sender, RoutedEventArgs e)
-        {
+		private void BtnSave_Click(object sender, RoutedEventArgs e)
+		{
 			config.Update(s =>
 			{
 				s.HISDbConfig.SelectedHISDbAddrIndex = cbDbServer.SelectedIndex;
@@ -59,11 +59,17 @@ namespace Nimaime.SPD.HIS
 				s.HISDbConfig.Password = txtDbPassword.Password;
 			});
 			Close();
-        }
+		}
 
 		private async void BtnTest_Click(object sender, RoutedEventArgs e)
 		{
 			btnTest.IsEnabled = false;
+			config.Update(s =>
+			{
+				s.HISDbConfig.SelectedHISDbAddrIndex = cbDbServer.SelectedIndex;
+				s.HISDbConfig.UserName = txtDbUser.Text;
+				s.HISDbConfig.Password = txtDbPassword.Password;
+			});
 			(bool testResult, string msg) = await config.Current.HISDbConfig.TestConnection();
 			if (testResult)
 			{
@@ -75,5 +81,5 @@ namespace Nimaime.SPD.HIS
 			}
 			btnTest.IsEnabled = true;
 		}
-    }
+	}
 }

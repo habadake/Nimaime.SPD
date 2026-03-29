@@ -12,13 +12,11 @@ namespace Nimaime.SPD.Common
 		/// </summary>
 		public static async Task<(bool Success, string Message)> TestConnectionAsync(
 			HISDbConfig hisDB,
-			string serviceName = "ORCL",
-			int timeoutSeconds = 5)
+			string serviceName = "orcl")
 		{
 			try
 			{
-				string connStr = $"Data Source = {hisDB.SelectedHISDbAddr.IP}:{hisDB.SelectedHISDbAddr.Port}/{serviceName}; User Id = {hisDB.UserName}; Password = {hisDB.Password}; pooling = true; Connection Timeout={timeoutSeconds};";
-				connStr = @"User Id=INSURANCE;Password=INSURANCE;Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.0.12)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=orcl)));";
+				string connStr = $"User Id={hisDB.UserName};Password={hisDB.Password};Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST={hisDB.SelectedHISDbAddr.IP})(PORT={hisDB.SelectedHISDbAddr.Port}))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME={serviceName})));";
 				using OracleConnection conn = new(connStr);
 				conn.Open();
 

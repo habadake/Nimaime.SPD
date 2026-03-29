@@ -43,4 +43,41 @@ namespace Nimaime.SPD.Common
 			PropertyNameCaseInsensitive = true,
 		};
 	}
+
+	/// <summary>
+	/// 有关时间日期的相关方法
+	/// </summary>
+	public static class DateTimeMethods
+	{
+		/// <summary>
+		/// 获取指定日期的上一个完整财务月的起止日期
+		/// </summary>
+		/// <param name="day">指定日期</param>
+		/// <returns>上一个完整财务月的起止日期</returns>
+		public static (DateTime start, DateTime end) GetLastFinancialMonth(DateTime day)
+		{
+			DateTime currentStart;
+			DateTime currentEnd;
+
+			if (day.Day >= 11)
+			{
+				// 当前财务月：本月11日 ~ 下月10日
+				currentStart = new DateTime(day.Year, day.Month, 11);
+				currentEnd = currentStart.AddMonths(1).AddDays(-1); // 下月10日
+			}
+			else
+			{
+				// 当前财务月：上月11日 ~ 本月10日
+				DateTime lastMonth = day.AddMonths(-1);
+				currentStart = new DateTime(lastMonth.Year, lastMonth.Month, 11);
+				currentEnd = new DateTime(day.Year, day.Month, 10);
+			}
+
+			// 上一个完整财务月
+			DateTime lastStart = currentStart.AddMonths(-1);
+			DateTime lastEnd = currentStart.AddDays(-1);
+
+			return (lastStart, lastEnd);
+		}
+	}
 }

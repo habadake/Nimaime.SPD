@@ -5,6 +5,7 @@
 				xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 				xmlns:local="clr-namespace:Nimaime.SPD"
 				xmlns:controls="clr-namespace:Nimaime.SPD.Controls"
+				xmlns:sys="clr-namespace:System;assembly=mscorlib"
 				mc:Ignorable="d"
 				Title="二枚目国药SPD系统帮助程序" Height="720" Width="1280">
 	<Grid>
@@ -94,6 +95,30 @@
 				<TabItem Header="消耗查询">
 					<Grid Background="#FFE5E5E5">
 						<TabControl Name="tabConsume">
+							<TabItem Header="消耗报表">
+								<Grid Background="#FFE5E5E5">
+									<Grid.RowDefinitions>
+										<RowDefinition Height="Auto"/>
+										<RowDefinition Height="*"/>
+									</Grid.RowDefinitions>
+									<Grid Grid.Row="0">
+										<StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+											<StackPanel.Resources>
+												<Style TargetType="Button">
+													<Setter Property="Margin" Value="5,0,0,0"/>
+												</Style>
+											</StackPanel.Resources>
+											<Label Content="科室："/>
+											<controls:SearchableComboBox x:Name="cbDeptInConsume" Width="120" VerticalAlignment="Top" DisplayMemberPath="EName"/>
+											<Label Content="起始日期："/>
+											<DatePicker x:Name="dpStartDate" DisplayDateStart="2022-07-01" SelectedDate="{x:Static sys:DateTime.Now}" Width="108"/>
+											<Label Content="结束日期："/>
+											<DatePicker x:Name="dpEndDate" DisplayDateStart="2022-07-01" SelectedDate="{x:Static sys:DateTime.Now}" Width="108"/>
+											<Button Name="btnSetLastFinanceMonth" Content="一键设为上个财务月" Click="btnSetLastFinanceMonth_Click"/>
+										</StackPanel>
+									</Grid>
+								</Grid>
+							</TabItem>
 							<TabItem Header="高值追溯">
 								<Grid Background="#FFE5E5E5">
 									<Grid.RowDefinitions>

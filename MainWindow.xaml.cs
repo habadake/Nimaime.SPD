@@ -120,6 +120,7 @@ namespace Nimaime.SPD
 				$"SERVER：{config.Current.SelectedSPDWebAddr}\n" +
 				$"上次登录时间：{config.Current.LastLoginTime:yyyy-MM-dd HH:mm:ss}";
 			LoadProviderToCB();
+			LoadDeptToCB();
 		}
 
 		/// <summary>
@@ -408,7 +409,12 @@ namespace Nimaime.SPD
 		{
 			List<Provider> providers = await ProviderMethods.GetProviders();
 			cbProviderInMaterial.ItemsSource = providers;
-			return;
+		}
+
+		private async void LoadDeptToCB()
+		{
+			List<Department> depts = await DepartmentMethods.GetAllDepartments();
+			cbDeptInConsume.ItemsSource = depts;
 		}
 
 		/// <summary>
@@ -425,7 +431,18 @@ namespace Nimaime.SPD
 		#endregion
 
 		#region TAB 02 消耗查询
-		#region TAB 02-01 EPC 追溯
+		# region TAB 02-01 消耗报表
+		/// <summary>
+		/// 一键设置为上一个财务月
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void btnSetLastFinanceMonth_Click(object sender, RoutedEventArgs e)
+		{
+			(dpStartDate.SelectedDate, dpEndDate.SelectedDate) = DateTimeMethods.GetLastFinancialMonth(DateTime.Now);
+		}
+		#endregion
+		#region TAB 02-02 高值追溯
 		/// <summary>
 		/// 单个EPC输入追溯
 		/// </summary>
@@ -578,6 +595,9 @@ namespace Nimaime.SPD
 		#region TAB 03 后勤物资
 		/// <summary>
 		/// 补充后勤出入库报表退还单据缺失的科室字段
+		/// 因需要原样输出Excel
+		/// 所以不使用ExcelHelper
+		/// 直接使用NPOI进行读写操作
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
