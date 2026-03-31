@@ -3,7 +3,6 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
-using static Microsoft.IO.RecyclableMemoryStreamManager;
 using static Nimaime.Helper.File.CommonFileHelper;
 
 namespace Nimaime.SPD.SPD
@@ -11,10 +10,8 @@ namespace Nimaime.SPD.SPD
 	public class Material
 	{
 		// ===== 核心字段（常用） =====
-		/// <summary>
-		/// SPD ID
-		/// </summary>
 		public string id { get; set; }
+
 		public int SPDID
 		{
 			get
@@ -22,87 +19,39 @@ namespace Nimaime.SPD.SPD
 				return Convert.ToInt32(id.Split('-')[1]);
 			}
 		}
-		/// <summary>
-		/// 品名
-		/// </summary>
+
 		public string goodsName { get; set; }
-		/// <summary>
-		/// 规格
-		/// </summary>
 		public string goodsGg { get; set; }
-
 		public string generalName { get; set; }
-
 		public string goodsProperty { get; set; }
-		/// <summary>
-		/// 单位
-		/// </summary>
 		public string unit { get; set; }
-		/// <summary>
-		/// 价格
-		/// </summary>
 		public decimal? price { get; set; }
-
 		public decimal? hisPrice { get; set; }
-		/// <summary>
-		/// 供应商 ID
-		/// </summary>
+
 		public string provId { get; set; }
-		/// <summary>
-		/// 供应商名称
-		/// </summary>
 		public string provName { get; set; }
-		/// <summary>
-		/// 厂家ID
-		/// </summary>
+
 		public string mfrsId { get; set; }
-		/// <summary>
-		/// 厂家名称
-		/// </summary>
 		public string mfrsName { get; set; }
 
 		public string brand { get; set; }
-
 		public string made { get; set; }
-		/// <summary>
-		/// HIS编码
-		/// </summary>
+
 		public string erpCode { get; set; }
-
 		public string spdGoodsCode { get; set; }
-
 		public string hosId { get; set; }
-		/// <summary>
-		/// 分类信息
-		/// </summary>
+
 		public string hosKindName { get; set; }
 
-		/// <summary>
-		/// 启用状态 1=启用 0=停用
-		/// </summary>
 		public string flag { get; set; }
-		/// <summary>
-		/// 启停描述字符串
-		/// </summary>
 		public string flagStr { get; set; }
-		/// <summary>
-		/// 是否收费
-		/// </summary>
+
 		public string charging { get; set; }
-		/// <summary>
-		/// 是否收费
-		/// </summary>
-		public string isCharging
-		{
-			get
-			{
-				return charging == "1" ? "是" : "否";
-			}
-		}
-		/// <summary>
-		/// 是否可采购
-		/// </summary>
+
+		public string isCharging => charging == "1" ? "是" : "否";
+
 		public string canPurchase { get; set; }
+
 		public string purchaseStatus
 		{
 			get
@@ -114,11 +63,9 @@ namespace Nimaime.SPD.SPD
 				return result;
 			}
 		}
-		/// <summary>
-		/// 物资类型
-		/// 10=低值 20=高值 60=试剂
-		/// </summary>
+
 		public string purMode { get; set; }
+
 		public string purType
 		{
 			get
@@ -132,77 +79,164 @@ namespace Nimaime.SPD.SPD
 				};
 			}
 		}
-		/// <summary>
-		/// 是否带量
-		/// </summary>
+
 		public string purchaseContract { get; set; }
-		/// <summary>
-		/// 27 位医保编码
-		/// </summary>
 		public string icdCode { get; set; }
 
 		public string managerKind { get; set; }
-
 		public string kindMaterial { get; set; }
 
 		public string shortPinyin { get; set; }
-		/// <summary>
-		/// 省平台编码
-		/// </summary>
+
 		public string hitCode { get; set; }
-		/// <summary>
-		/// 注册证号
-		/// </summary>
 		public string certificateCode { get; set; }
 
 		public string registrationLevel { get; set; }
-
 		public string riskLevel { get; set; }
-
 		public string consumableLevel { get; set; }
 
 		public string hazardousAttribute { get; set; }
 
 		public string isIntoCost { get; set; }
-
 		public string isGcp { get; set; }
-
 		public string isSpecialFunds { get; set; }
 
 		public string isOnline { get; set; }
-
 		public string isDistrRel { get; set; }
-		/// <summary>
-		/// 临采标识
-		/// </summary>
+
 		public string tempPurchase { get; set; }
 
 		public string isHasStock { get; set; }
-
 		public string stockQty { get; set; }
 
 		public decimal? taxRate { get; set; }
 
 		public int? version { get; set; }
-
 		public int? sendPackage { get; set; }
-		/// <summary>
-		/// 导入人
-		/// </summary>
+
 		public string ename { get; set; }
-		/// <summary>
-		/// 导入日期
-		/// </summary>
 		public DateTime? fillDate { get; set; }
-		/// <summary>
-		/// 上次更新日期
-		/// </summary>
 		public DateTime? lastUpdateDatetime { get; set; }
 
-		// ===== 扩展字段（自动接收所有未定义字段） =====
 
-		[JsonExtensionData]
-		public Dictionary<string, JsonElement> Extra { get; set; }
+		// ===== 🔽 新增字段（来自第二组JSON补充） =====
+
+		public string code { get; set; }
+		public string masterCode { get; set; }
+		public string uniqueCodeStrategy { get; set; }
+
+		public decimal? packeage { get; set; }
+
+		public string kindCode { get; set; }
+		public string kind68code { get; set; }
+
+		public string fieldCode2 { get; set; }
+		public string fieldCode3 { get; set; }
+		public string fieldCode4 { get; set; }
+
+		public decimal? hitPrice { get; set; }
+
+		public string lbsx { get; set; }
+
+		public string remark { get; set; }
+		public string remarkChg { get; set; }
+
+		public string uxid { get; set; }
+
+		public string miName { get; set; }
+		public string miCode { get; set; }
+
+		public string goodsDesc { get; set; }
+
+		public string goodsDescFile { get; set; }
+		public string fileName { get; set; }
+
+		public string salemanId { get; set; }
+		public string salemanCode { get; set; }
+
+		public string subPurMode { get; set; }
+
+		public string midPackageUnit { get; set; }
+
+		public string useUnit { get; set; }
+		public decimal? useUnitCount { get; set; }
+
+		public string icdName { get; set; }
+		public string icd20Code { get; set; }
+
+		public string barCodeMng { get; set; }
+
+		public string storageConditions { get; set; }
+
+		public string ygptCode { get; set; }
+		public string ygptPrimaryCode { get; set; }
+
+		public string onlineKind { get; set; }
+
+		public string hitId { get; set; }
+
+		public string isSpecialized { get; set; }
+
+		public string miGg { get; set; }
+		public string miType { get; set; }
+
+		public string medicalOnlinePay { get; set; }
+
+		public string extInt2 { get; set; }
+		public string extInt3 { get; set; }
+		public string extInt5 { get; set; }
+		public string extInt6 { get; set; }
+		public int? extInt7 { get; set; }
+		public string extInt8 { get; set; }
+
+		public string ext1 { get; set; }
+		public string ext2 { get; set; }
+		public string ext3 { get; set; }
+
+		public string gbm { get; set; }
+		public string ext8 { get; set; }
+
+		public DateTime? extDatetime2 { get; set; }
+
+		public string ext12 { get; set; }
+		public string ext13 { get; set; }
+		public string ext14 { get; set; }
+
+		public string deptId { get; set; }
+
+		public int? imgCount { get; set; }
+
+		public decimal? quantity { get; set; }
+
+		public decimal? sPrice { get; set; }
+		public decimal? ePrice { get; set; }
+
+		public bool? hasSubmit { get; set; }
+
+		public string regCode { get; set; }
+
+		public string sdPurchase { get; set; }
+
+		public string diPackage { get; set; }
+
+		public string auditorId { get; set; }
+		public string auditorName { get; set; }
+
+		public DateTime? auditDate { get; set; }
+
+		public DateTime? auditorHandleDate { get; set; }
+
+		public string subProvId { get; set; }
+		public string subProvName { get; set; }
+
+		public string deviceCode { get; set; }
+		public string deviceName { get; set; }
+
+		public string goodsImageFlag { get; set; }
+
+		public string isTrackable { get; set; }
+
+		public bool? trackable { get; set; }
 	}
 
 	/// <summary>
@@ -241,6 +275,15 @@ namespace Nimaime.SPD.SPD
 			}
 		}
 
+		public static async Task<bool> ImportMaterial2Dept(string spdID, List<Department> lstDept)
+		{
+
+			foreach (Department dept in lstDept)
+			{
+				
+			}
+			return false;
+		}
 
 		/// <summary>
 		/// 导出SPD耗材目录（指定条件）

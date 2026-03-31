@@ -27,6 +27,8 @@ namespace Nimaime.SPD
 	public partial class MainWindow : Window
 	{
 		ConfigService config = new();
+		public ContextMenu menuDGMaterial { get; set; }
+
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -428,10 +430,29 @@ namespace Nimaime.SPD
 		{
 			e.Handled = true;
 		}
+		private void dgMaterial_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			menuDGMaterial = new();
+			MenuItem dgMaterialContextImport2Dept = new()
+			{
+				Header = "导入到科室"
+			};
+			dgMaterialContextImport2Dept.Click += dgMaterialContextImport2Dept_Click;
+			menuDGMaterial.Items.Add(dgMaterialContextImport2Dept);
+			menuDGMaterial.StaysOpen = true;
+			menuDGMaterial.IsOpen = true;
+		}
+
+		private void dgMaterialContextImport2Dept_Click(object sender, RoutedEventArgs e)
+		{
+			List<Material> lstSelectedMat = [.. dgMaterial.SelectedItems.Cast<Material>()];
+			ImportMaterial2Dept window = new(lstSelectedMat);
+			window.ShowDialog();
+		}
 		#endregion
 
 		#region TAB 02 消耗查询
-		# region TAB 02-01 消耗报表
+		#region TAB 02-01 消耗报表
 		/// <summary>
 		/// 一键设置为上一个财务月
 		/// </summary>
@@ -478,14 +499,22 @@ namespace Nimaime.SPD
 				$"配送单：{data.BatchId}\n" +
 				$"供应商名称：{data.ProvName}\n" +
 				$"生产厂商名称：{data.MfrsName}\n" +
-				$"库存科室：{data.KcDeptName}\n" +
+				$"库存科室：{data.StocName}\n" +
 				$"注册证：{data.CertificateCode}\n\n";
 			if (data.TraceablityNodes != null && data.TraceablityNodes.Count > 0)
 			{
 				msgBoxContent += "追溯信息：\n";
 				foreach (var node in data.TraceablityNodes)
 				{
-					msgBoxContent += $"-【{node.InType}】 {node.FillDate:yyyy-MM-dd HH:mm:ss}\n  {node.OutOrgName + node.OutDeptName} → {node.InDeptName} \n  制单：{node.FillerName} 审核：{node.Auditor}\n\n";
+					msgBoxContent += $"-【{node.InType}】 {node.FillDate:yyyy-MM-dd HH:mm:ss}\n  {node.OutOrgName + node.OutDeptName} → {node.InDeptName} \n  制单：{node.FillerName} ";
+					if (!string.IsNullOrWhiteSpace(node.Auditor))
+					{
+						msgBoxContent += $"审核：{node.Auditor}\n\n";
+					}
+					else
+					{
+						msgBoxContent += "\n\n";
+					}
 				}
 			}
 			MessageBox.Show(msgBoxContent, msgBoxTitle, MessageBoxButton.OK, MessageBoxImage.Information);
@@ -702,5 +731,6 @@ namespace Nimaime.SPD
 			}
 		}
 		#endregion
+
 	}
 }

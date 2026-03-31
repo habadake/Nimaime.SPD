@@ -66,7 +66,14 @@
 							</Grid>
 						</Grid>
 						<Grid Grid.Row="1">
-							<DataGrid x:Name="dgMaterial" AutoGenerateColumns="False" SelectionMode="Single" CanUserResizeRows="False" IsSynchronizedWithCurrentItem="False">
+							<DataGrid x:Name="dgMaterial"
+									  AutoGenerateColumns="False"
+									  SelectionMode="Extended"
+									  CanUserResizeRows="False"
+									  IsSynchronizedWithCurrentItem="False"
+									  ContextMenu="{Binding menuDGMaterial}"
+									  MouseRightButtonDown="dgMaterial_MouseRightButtonDown"
+									  >
 								<DataGrid.Columns>
 									<DataGridTextColumn Header="ID" Binding="{Binding SPDID}" IsReadOnly="True"/>
 									<DataGridTextColumn Header="HIS编码" Binding="{Binding erpCode}" IsReadOnly="True"/>
