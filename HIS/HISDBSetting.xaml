@@ -5,84 +5,64 @@
 				xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 				xmlns:local="clr-namespace:Nimaime.SPD"
 				mc:Ignorable="d"
-				Title="数据库配置" Height="300" Width="700">
+				xmlns:hc="https://handyorg.github.io/handycontrol"
+				Title="数据库配置" Height="180" Width="320">
 
-	<Grid Grid.IsSharedSizeScope="True">
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="140"/>
-			<ColumnDefinition Width="*"/>
-		</Grid.ColumnDefinitions>
+	<Grid Margin="5">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="Auto"/>
+		</Grid.RowDefinitions>
 
-		<!-- 左侧提示 -->
-		<Grid Grid.Column="0">
-			<Grid.RowDefinitions>
-				<RowDefinition Height="64"/>
-				<RowDefinition Height="64"/>
-				<RowDefinition Height="64"/>
-				<RowDefinition Height="60"/>
-			</Grid.RowDefinitions>
+		<!-- 数据库地址 -->
+		<hc:ComboBox Grid.Row="0" Name="cbDbServer"
+				hc:InfoElement.TitlePlacement="Left"
+				hc:InfoElement.Title="地址"
+				hc:InfoElement.Necessary="True"
+				DisplayMemberPath="Name"
+				SelectedValuePath="Value"/>
 
-			<Label Grid.Row="0" Content="数据库地址" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22"/>
-			<Label Grid.Row="1" Content="用户名" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22"/>
-			<Label Grid.Row="2" Content="密码" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22"/>
-		</Grid>
+		<!-- 用户名 -->
+		<TextBox Grid.Row="1" Name="txtDbUser"
+				VerticalAlignment="Center"
+				hc:InfoElement.TitlePlacement="Left"
+				hc:InfoElement.Title="账号"
+				hc:InfoElement.Necessary="True"
+				Style="{StaticResource TextBoxExtend}"
+				Margin="0,5,0,0"/>
 
-		<!-- 右侧输入 -->
-		<Grid Grid.Column="1">
-			<Grid.RowDefinitions>
-				<RowDefinition Height="64"/>
-				<RowDefinition Height="64"/>
-				<RowDefinition Height="64"/>
-				<RowDefinition Height="60"/>
-			</Grid.RowDefinitions>
+		<!-- 密码 -->
+		<PasswordBox Grid.Row="2" Name="txtDbPassword"
+				VerticalAlignment="Center"
+				hc:InfoElement.TitlePlacement="Left"
+				hc:InfoElement.Title="密码"
+				hc:InfoElement.Necessary="True"
+				Style="{StaticResource PasswordBoxExtend}"
+				Margin="0,5,0,0"/>
 
-			<!-- 数据库地址 -->
-			<ComboBox Grid.Row="0"
-					Name="cbDbServer"
-					Height="40"
-					FontSize="24"
-					Margin="0,0,10,0"
-					DisplayMemberPath="Name"
-					SelectedValuePath="Value"/>
+		<!-- 保存按钮 -->
+		<Grid Grid.Row="4">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition Width="Auto"/>
+			</Grid.ColumnDefinitions>
 
-			<!-- 用户名 -->
-			<TextBox Grid.Row="1"
-					Name="txtDbUser"
-					VerticalAlignment="Center"
-					FontSize="24"
-					Margin="0,0,10,0"/>
+			<Button Grid.Column="1"
+				Name="btnTest"
+				Content="测试连接"
+				Width="100"
+				Margin="0,0,5,0"
+				Click="BtnTest_Click"/>
 
-			<!-- 密码 -->
-			<PasswordBox Grid.Row="2"
-					Name="txtDbPassword"
-					VerticalAlignment="Center"
-					FontSize="24"
-					Margin="0,0,10,0"/>
-
-			<!-- 保存按钮 -->
-			<Grid Grid.Row="3">
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="*"/>
-					<ColumnDefinition Width="Auto"/>
-					<ColumnDefinition Width="Auto"/>
-				</Grid.ColumnDefinitions>
-
-				<Button Grid.Column="1"
-					Name="btnTest"
-					Content="测试连接"
-					Width="120"
-					FontSize="22"
-					Margin="0,0,10,10"
-					Click="BtnTest_Click"/>
-
-				<Button Grid.Column="2"
-					Name="btnSave"
-					Content="保存"
-					Width="120"
-					FontSize="22"
-					Margin="0,0,10,10"
-					Click="BtnSave_Click"/>
-			</Grid>
+			<Button Grid.Column="2"
+				Name="btnSave"
+				Content="保存"
+				Width="100"
+				Click="BtnSave_Click"/>
 		</Grid>
 	</Grid>
 </Window>

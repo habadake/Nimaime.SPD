@@ -4,9 +4,43 @@
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:local="clr-namespace:Nimaime.SPD.SPD"
+		xmlns:hc="https://handyorg.github.io/handycontrol"
 		mc:Ignorable="d"
-		Title="产品批量导入科室" Height="450" Width="720">
-	<Grid>
-		
+		Title="产品批量导入科室" Height="200" Width="480"
+>
+	<Grid Grid.Row="0" HorizontalAlignment="Stretch" Margin="5">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="Auto"/>
+		</Grid.RowDefinitions>
+		<hc:CheckComboBox
+			Grid.Row="0"
+			Name="cbDept2Imp"
+			Style="{StaticResource CheckComboBoxExtend}"
+			hc:InfoElement.TitlePlacement="Left"
+			hc:InfoElement.ShowClearButton="True"
+			hc:InfoElement.Title="目标科室"
+			hc:InfoElement.Placeholder="请选择科室"
+			ShowSelectAllButton="True"
+			DisplayMemberPath="EName"
+			SelectionChanged="cbDept2Imp_SelectionChanged"
+		/>
+		<Grid Grid.Row="1" Margin="0,5,0,0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="Auto"/>
+			</Grid.ColumnDefinitions>
+			<TextBox Grid.Column="0" Name="txtDeptKeyword"
+							 hc:InfoElement.TitlePlacement="Left"
+							 hc:InfoElement.Title="搜索科室"
+							 Style="{StaticResource TextBoxExtend}"/>
+			<Button Grid.Column="1" Name="btnAddDept2CB" Content="按关键字添加科室" Click="btnAddDept2CB_Click" Margin="5,0,0,0"/>
+		</Grid>
+		<StackPanel Grid.Row="2" HorizontalAlignment="Right" Margin="0,5,0,0">
+			<Button Name="btnImport2Dept" HorizontalAlignment="Right" Click="btnImport2Dept_Click">
+				<Label Content="将{0}个耗材导入{1}个科室" Name="lblHint"/>
+			</Button>
+		</StackPanel>
 	</Grid>
 </Window>

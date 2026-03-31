@@ -3,13 +3,11 @@
     <Platform Name="x64" />
   </Configurations>
   <Project Path="../Nimaime.Helper.Data/Nimaime.Helper.Data.csproj" Id="fdcdf489-3125-4294-9485-b3a238b3cecc">
-    <BuildType Project="Release" />
-    <Platform Project="x64" />
+    <Platform Solution="Release|*" Project="x64" />
     <Build Solution="Release|*" Project="false" />
   </Project>
   <Project Path="../Nimaime.Helper.File/Nimaime.Helper.File.csproj" Id="6567baae-f4d6-4288-bc2a-eb7fdec5d3bd">
-    <BuildType Project="Release" />
-    <Platform Project="x64" />
+    <Platform Solution="Release|*" Project="x64" />
     <Build Solution="Release|*" Project="false" />
   </Project>
   <Project Path="Nimaime.SPD.csproj">

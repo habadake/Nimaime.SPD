@@ -12,10 +12,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Threading;
-using static ICSharpCode.SharpZipLib.Zip.ExtendedUnixData;
 using static Nimaime.SPD.SPD.ConsumeMethods.EPC;
 using static Nimaime.SPD.SPD.MaterialMethods;
 
@@ -181,12 +178,30 @@ namespace Nimaime.SPD
 		/// <param name="e"></param>
 		private async void btnLoadMaterial_Click(object sender, RoutedEventArgs e)
 		{
-			btnLoadMaterial.IsEnabled = false;
-			SPDMaterialParameter para = GenMaterialParaByUI();
-			List<Material> materials = await MaterialMethods.GetSPDMaterialList(para);
-			// TODO 打表
-			dgMaterial.ItemsSource = materials;
-			btnLoadMaterial.IsEnabled = true;
+			try
+			{
+				btnLoadMaterial.IsEnabled = false;
+				btnLoadMaterial.Content = "加载中...";
+
+				SPDMaterialParameter para = GenMaterialParaByUI();
+				List<Material> materials = await MaterialMethods.GetSPDMaterialList(para);
+
+				dgMaterial.ItemsSource = materials;
+
+				if (materials.Count == 0)
+				{
+					MessageBox.Show("未找到符合条件的耗材数据", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+				}
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show($"加载耗材失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+			finally
+			{
+				btnLoadMaterial.IsEnabled = true;
+				btnLoadMaterial.Content = "加载";
+			}
 		}
 
 		/// <summary>

@@ -6,6 +6,7 @@
 				xmlns:local="clr-namespace:Nimaime.SPD"
 				xmlns:controls="clr-namespace:Nimaime.SPD.Controls"
 				xmlns:sys="clr-namespace:System;assembly=mscorlib"
+				xmlns:hc="https://handyorg.github.io/handycontrol"
 				mc:Ignorable="d"
 				Title="二枚目国药SPD系统帮助程序" Height="720" Width="1280">
 	<Grid>
@@ -27,14 +28,14 @@
 		<Grid Grid.Row="0">
 			<Label Content="当前登录用户：未登录(双击此处登录)" HorizontalAlignment="Left" VerticalAlignment="Top" Name="lblLoginStatus" MouseDoubleClick="lblLoginStatus_MouseDoubleClick"/>
 			<Button Name="btnLogout" Content="注销" HorizontalAlignment="Right" Click="btnLogout_Click"/>
-			<Button Name="btnHISDBSetting" Content="HIS数据库设置" HorizontalAlignment="Right" Margin="0,0,36,0" Click="btnHISDBSetting_Click"/>
+			<Button Name="btnHISDBSetting" Content="HIS数据库设置" HorizontalAlignment="Right" Margin="0,0,56,0" Click="btnHISDBSetting_Click"/>
 		</Grid>
 		<Grid Grid.Row="1">
 			<TabControl Name="tabMain" SelectionChanged="MainTab_SelectionChanged">
 				<TabItem Header="基础数据">
 					<Grid Background="#FFE5E5E5">
 						<Grid.RowDefinitions>
-							<RowDefinition Height="21"/>
+							<RowDefinition Height="Auto"/>
 							<RowDefinition Height="*"/>
 						</Grid.RowDefinitions>
 						<Grid Grid.Row="0">
@@ -67,13 +68,13 @@
 						</Grid>
 						<Grid Grid.Row="1">
 							<DataGrid x:Name="dgMaterial"
-									  AutoGenerateColumns="False"
-									  SelectionMode="Extended"
-									  CanUserResizeRows="False"
-									  IsSynchronizedWithCurrentItem="False"
-									  ContextMenu="{Binding menuDGMaterial}"
-									  MouseRightButtonDown="dgMaterial_MouseRightButtonDown"
-									  >
+									AutoGenerateColumns="False"
+									SelectionMode="Extended"
+									CanUserResizeRows="False"
+									IsSynchronizedWithCurrentItem="False"
+									ContextMenu="{Binding menuDGMaterial}"
+									MouseRightButtonDown="dgMaterial_MouseRightButtonDown"
+									>
 								<DataGrid.Columns>
 									<DataGridTextColumn Header="ID" Binding="{Binding SPDID}" IsReadOnly="True"/>
 									<DataGridTextColumn Header="HIS编码" Binding="{Binding erpCode}" IsReadOnly="True"/>
@@ -110,17 +111,26 @@
 									</Grid.RowDefinitions>
 									<Grid Grid.Row="0">
 										<StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-											<StackPanel.Resources>
-												<Style TargetType="Button">
-													<Setter Property="Margin" Value="5,0,0,0"/>
-												</Style>
-											</StackPanel.Resources>
 											<Label Content="科室："/>
 											<controls:SearchableComboBox x:Name="cbDeptInConsume" Width="120" VerticalAlignment="Top" DisplayMemberPath="EName"/>
-											<Label Content="起始日期："/>
-											<DatePicker x:Name="dpStartDate" DisplayDateStart="2022-07-01" SelectedDate="{x:Static sys:DateTime.Now}" Width="108"/>
-											<Label Content="结束日期："/>
-											<DatePicker x:Name="dpEndDate" DisplayDateStart="2022-07-01" SelectedDate="{x:Static sys:DateTime.Now}" Width="108"/>
+											<DatePicker
+												hc:InfoElement.Necessary="True"
+												Style="{StaticResource DatePickerExtend}"
+												hc:InfoElement.TitlePlacement="Left"
+												hc:InfoElement.Title="起始日期"
+												Name="dpStartDate"
+												DisplayDateStart="2022-07-01"
+												SelectedDate="{x:Static sys:DateTime.Now}"
+												Width="180"/>
+											<DatePicker
+												hc:InfoElement.Necessary="True"
+												Style="{StaticResource DatePickerExtend}"
+												hc:InfoElement.TitlePlacement="Left"
+												hc:InfoElement.Title="结束日期"
+												Name="dpEndDate"
+												DisplayDateStart="2022-07-01"
+												SelectedDate="{x:Static sys:DateTime.Now}"
+												Width="180"/>
 											<Button Name="btnSetLastFinanceMonth" Content="一键设为上个财务月" Click="btnSetLastFinanceMonth_Click"/>
 										</StackPanel>
 									</Grid>
@@ -159,12 +169,11 @@
 						</Grid.RowDefinitions>
 						<Grid Grid.Row="0">
 							<StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-								<StackPanel.Resources>
-									<Style TargetType="{x:Type Button}">
-										<Setter Property="Margin" Value="0,0,5,0"/>
-									</Style>
-								</StackPanel.Resources>
-								<Button Name="btnFetchDeptByImmRK" Content="后勤出入库报表补充退库科室" HorizontalAlignment="Left" VerticalAlignment="Top" Click="btnFetchDeptByImmRK_Click"/>
+								<Button 
+									Name="btnFetchDeptByImmRK"
+									Margin="5"
+									Content="后勤出入库报表补充退库科室"
+									Click="btnFetchDeptByImmRK_Click"/>
 							</StackPanel>
 						</Grid>
 					</Grid>

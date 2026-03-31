@@ -4,59 +4,46 @@
 				xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 				xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 				xmlns:local="clr-namespace:Nimaime.SPD"
+				xmlns:hc="https://handyorg.github.io/handycontrol"
 				mc:Ignorable="d"
-				Title="登录" Height="264" Width="659">
-	<Grid Grid.IsSharedSizeScope="True">
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="110"/>
-			<ColumnDefinition Width="*"/>
-		</Grid.ColumnDefinitions>
-		<!--HINT-->
-		<Grid Grid.Column="0">
-			<Grid.RowDefinitions>
-				<RowDefinition Height="64"/>
-				<RowDefinition Height="64"/>
-				<RowDefinition Height="*"/>
-				<RowDefinition Height="60"/>
-			</Grid.RowDefinitions>
-			<!--ACCOUNT-->
-			<Grid Grid.Row="0">
-				<Label Grid.Column="0" Content="账号" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"/>
-			</Grid>
-			<!--PASSWORD-->
-			<Grid Grid.Row="1">
-				<Label Grid.Column="0" Content="密码" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"/>
-			</Grid>
+				Title="登录" Height="150" Width="360"
+				ResizeMode="NoResize">
+	<Grid Margin="5">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="Auto"/>
+		</Grid.RowDefinitions>
+		<!--ACCOUNT-->
+		<Grid Grid.Row="0">
+			<TextBox Name="txtAccount" VerticalAlignment="Center"
+							 hc:InfoElement.TitlePlacement="Left"
+							 hc:InfoElement.Title="账号"
+							 Style="{StaticResource TextBoxExtend}"
+							/>
 		</Grid>
-		<!--INPUT-->
-		<Grid Grid.Column="1">
-			<Grid.RowDefinitions>
-				<RowDefinition Height="64"/>
-				<RowDefinition Height="64"/>
-				<RowDefinition Height="*"/>
-				<RowDefinition Height="60"/>
-			</Grid.RowDefinitions>
-			<!--ACCOUNT-->
-			<Grid Grid.Row="0">
-				<TextBox Name="txtAccount" VerticalAlignment="Center" FontSize="24" Margin="0,0,10,0"/>
-			</Grid>
-			<!--PASSWORD-->
-			<Grid Grid.Row="1">
-				<PasswordBox Name="txtPassword" VerticalAlignment="Center" FontSize="24" Margin="0,0,10,0"/>
-			</Grid>
-			<!--REMEMBER PASSWORD-->
-			<Grid Grid.Row="2">
-				<CheckBox Name="chkRememberPassword" Content="记住密码" IsChecked="True" HorizontalAlignment="Right" FontSize="24" Margin="0,0,10,0"/>
-			</Grid>
-			<!--LOGIN BUTTON-->
-			<Grid Grid.Row="3">
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="*"/>
-					<ColumnDefinition Width="Auto"/>
-				</Grid.ColumnDefinitions>
-				<ComboBox Grid.Column="0" Name="cbSPDURL" HorizontalAlignment="Stretch" Height="40" FontSize="24" IsEditable="False" Margin="0,0,10,10" DisplayMemberPath="Name" SelectedValuePath="Url"/>
-				<Button Grid.Column="1" Name="btnLogin" Content="登录" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="24" Click="BtnLogin_Click" Width="100" Margin="0,0,10,10"/>
-			</Grid>
+		<!--PASSWORD-->
+		<Grid Grid.Row="1" Margin="0,5,0,0">
+			<PasswordBox Name="txtPassword" VerticalAlignment="Center"
+									 hc:InfoElement.TitlePlacement="Left"
+									 hc:InfoElement.Title="密码"
+									 Style="{StaticResource PasswordBoxExtend}"
+									/>
+		</Grid>
+		<!--REMEMBER PASSWORD-->
+		<Grid Grid.Row="2" Margin="0,5,0,0">
+			<CheckBox Name="chkRememberPassword" Content="记住密码" IsChecked="True" HorizontalAlignment="Right"/>
+		</Grid>
+		<!--LOGIN BUTTON-->
+		<Grid Grid.Row="4">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="Auto"/>
+			</Grid.ColumnDefinitions>
+			<ComboBox Grid.Column="0" Name="cbSPDURL" HorizontalAlignment="Stretch" IsEditable="False" Margin="0,0,5,0" DisplayMemberPath="Name" SelectedValuePath="Url"/>
+			<Button Grid.Column="1" Name="btnLogin" Content="登录" HorizontalAlignment="Right" VerticalAlignment="Center" Click="BtnLogin_Click" Width="80"/>
 		</Grid>
 	</Grid>
 </Window>

@@ -1,5 +1,6 @@
 ﻿using Nimaime.SPD.Common;
 using System.IO;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
@@ -247,13 +248,27 @@ namespace Nimaime.SPD.SPD
 		/// <summary>
 		/// 获取指定条件的耗材列表
 		/// </summary>
-		/// <param name="para"></param>
-		/// <returns></returns>
+		/// <param name="para">查询参数</param>
+		/// <returns>耗材列表</returns>
 		public static async Task<List<Material>> GetSPDMaterialList(SPDMaterialParameter para)
+		{
+			return await GetSPDMaterialList(para, page: 1, rows: 5000);
+		}
+
+		/// <summary>
+		/// 获取指定条件的耗材列表（支持分页）
+		/// </summary>
+		/// <param name="para">查询参数</param>
+		/// <param name="page">页码（从1开始）</param>
+		/// <param name="rows">每页行数</param>
+		/// <returns>耗材列表</returns>
+		public static async Task<List<Material>> GetSPDMaterialList(SPDMaterialParameter para, int page, int rows)
 		{
 			GetMaterialRequest request = new()
 			{
-				queryObject = para
+				queryObject = para,
+				page = page,
+				rows = rows
 			};
 			try
 			{
@@ -275,14 +290,79 @@ namespace Nimaime.SPD.SPD
 			}
 		}
 
-		public static async Task<bool> ImportMaterial2Dept(string spdID, List<Department> lstDept)
+		/// <summary>
+		/// 将耗材导入到指定科室
+		/// </summary>
+		/// <param name="spdID">SPD耗材ID或名称</param>
+		/// <param name="lstDept">科室列表</param>
+		/// <returns>是否全部导入成功</returns>
+		public static async Task<bool> ImportMaterial2Dept(List<Material> materials, List<Department> lstDept)
 		{
+			int successCount = 0;
+			int failCount = 0;
+			StringBuilder errorMsg = new();
 
+			// 遍历科室列表，逐个导入
 			foreach (Department dept in lstDept)
 			{
-				
+				try
+				{
+					// 构建请求对象
+					var importRequest = new
+					{
+						hosId = "h00a2",
+						deptId = dept.ID,
+						hosName = "",
+						deptName = dept.EName,
+						hosGoodsInfos = materials,
+						targetDeptId4imp = "h00a2org-11899",
+						specialized = "0"
+					};
+
+					// 序列化请求
+					string jsonRequest = JsonSerializer.Serialize(importRequest, JSOptionConverterMaker.Option);
+
+					// 发送POST请求
+					SPDHTTP spdHTTP = new();
+					string response = await spdHTTP.PostSPDWebAddr(
+						"/spdHERPService/deptMgr/deptGoodsInfo/deptGoodsInfoImport",
+						jsonRequest,
+						showError: false
+					);
+
+					// 解析响应
+					ApiResponse<object>? result = JsonSerializer.Deserialize<ApiResponse<object>>(response, JSOptionConverterMaker.Option);
+
+					if (result != null && result.code == 0)
+					{
+						successCount++;
+					}
+					else
+					{
+						failCount++;
+						errorMsg.AppendLine($"科室 [{dept.EName}] 导入失败：{result?.msg ?? "未知错误"}");
+					}
+				}
+				catch (Exception ex)
+				{
+					failCount++;
+					errorMsg.AppendLine($"科室 [{dept.EName}] 导入异常：{ex.Message}");
+				}
 			}
-			return false;
+
+			// 显示结果
+			if (failCount == 0)
+			{
+				MessageBox.Show($"成功导入到 {successCount} 个科室", 
+					"成功", MessageBoxButton.OK, MessageBoxImage.Information);
+				return true;
+			}
+			else
+			{
+				string message = $"导入完成：成功 {successCount} 个，失败 {failCount} 个\n\n失败详情：\n{errorMsg}";
+				MessageBox.Show(message, "部分失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+				return false;
+			}
 		}
 
 		/// <summary>
