@@ -29,6 +29,7 @@ namespace Nimaime.SPD
 		public MainWindow()
 		{
 			InitializeComponent();
+			DataContext = this;
 			CultureInfo culture = (CultureInfo)CultureInfo.CurrentCulture.Clone();
 
 			culture.DateTimeFormat.ShortDatePattern = "yyyy-MM-dd";
@@ -39,6 +40,9 @@ namespace Nimaime.SPD
 			CultureInfo.DefaultThreadCurrentUICulture = culture;
 
 			JSOptionConverterMaker.Option.Converters.Add(new DateTimeConverter());
+
+			cbMaterialDGPager.ItemsSource = Enum.GetNames<Enums.CountPerPage>();
+			cbMaterialDGPager.SelectedIndex = 0;
 
 			string programTitle = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyDescriptionAttribute>()?.Description ?? "二枚目国药SPD系统帮助程序";
 			//获取版本号
@@ -171,6 +175,8 @@ namespace Nimaime.SPD
 		#endregion
 
 		#region TAB 01 耗材管理
+		private int currentDGMatPage = -1;
+		private int currentDGMatPageCount = -1;
 		/// <summary>
 		/// 加载耗材信息到UI DataGrid
 		/// </summary>
@@ -178,14 +184,82 @@ namespace Nimaime.SPD
 		/// <param name="e"></param>
 		private async void btnLoadMaterial_Click(object sender, RoutedEventArgs e)
 		{
+			UpdateMatPage(1);
+		}
+
+
+		/// <summary>
+		/// 首页
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void btnDGMatFirstPage_Click(object sender, RoutedEventArgs e)
+		{
+			UpdateMatPage(1);
+		}
+
+		/// <summary>
+		/// 上一页
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void btnDGMatPrevPage_Click(object sender, RoutedEventArgs e)
+		{
+			UpdateMatPage(currentDGMatPage - 1);
+		}
+
+		/// <summary>
+		/// 下一页
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void btnDGMatNextPage_Click(object sender, RoutedEventArgs e)
+		{
+			UpdateMatPage(currentDGMatPage + 1);
+		}
+
+		/// <summary>
+		/// 尾页
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void btnDGMatLastPage_Click(object sender, RoutedEventArgs e)
+		{
+			UpdateMatPage(currentDGMatPageCount);
+		}
+
+		/// <summary>
+		/// 加载指定页面
+		/// </summary>
+		/// <param name="page2Load"></param>
+		private async void UpdateMatPage(int page2Load)
+		{
 			try
 			{
+				currentDGMatPage = -1;
 				btnLoadMaterial.IsEnabled = false;
+				btnDGMatFirstPage.IsEnabled = false;
+				btnDGMatLastPage.IsEnabled = false;
+				btnDGMatPrevPage.IsEnabled = false;
+				btnDGMatNextPage.IsEnabled = false;
 				btnLoadMaterial.Content = "加载中...";
 
 				SPDMaterialParameter para = GenMaterialParaByUI();
-				List<Material> materials = await MaterialMethods.GetSPDMaterialList(para);
-
+				Enums.CountPerPage enumPageCount = Enum.Parse<Enums.CountPerPage>(cbMaterialDGPager.SelectedItem.ToString() ?? "每页100个");
+				(List<Material> materials, currentDGMatPageCount) = await MaterialMethods.GetSPDMaterialList(para, page2Load, (int)enumPageCount);
+				if (currentDGMatPageCount > 0)
+				{
+					btnDGMatFirstPage.IsEnabled = currentDGMatPageCount > 1 && page2Load != 1;
+					btnDGMatLastPage.IsEnabled = currentDGMatPageCount > 1 && page2Load != currentDGMatPageCount;
+					btnDGMatPrevPage.IsEnabled = currentDGMatPageCount > 1 && page2Load > 1;
+					btnDGMatNextPage.IsEnabled = currentDGMatPageCount > 1 && page2Load < currentDGMatPageCount;
+					currentDGMatPage = page2Load;
+					lblDGMatPage.Content = $"{currentDGMatPage}/{currentDGMatPageCount}";
+				}
+				else
+				{
+					lblDGMatPage.Content = $"{0}/{0}";
+				}
 				dgMaterial.ItemsSource = materials;
 
 				if (materials.Count == 0)
@@ -424,27 +498,14 @@ namespace Nimaime.SPD
 		/// </summary>
 		private async void LoadProviderToCB()
 		{
-			List<Provider> providers = await ProviderMethods.GetProviders();
-			cbProviderInMaterial.ItemsSource = providers;
-		}
-
-		private async void LoadDeptToCB()
-		{
-			List<Department> depts = await DepartmentMethods.GetAllDepartments();
-			cbDeptInConsume.ItemsSource = depts;
+			cbProviderInMaterial.ItemsSource = await ProviderMethods.GetProviders();
 		}
 
 		/// <summary>
-		/// 防止tabMain_SelectionChanged事件导致的ComboBox刷新时
-		/// SelectedIndex变化引发的事件处理逻辑混乱（暂时没有更好的解决方案了）
-		/// FUCK MICROSOFT
+		/// 表格右键菜单
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void cbProvider_SelectionChanged(object sender, SelectionChangedEventArgs e)
-		{
-			e.Handled = true;
-		}
 		private void dgMaterial_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
 		{
 			menuDGMaterial = new();
@@ -458,6 +519,11 @@ namespace Nimaime.SPD
 			menuDGMaterial.IsOpen = true;
 		}
 
+		/// <summary>
+		/// 导入到科室菜单点击事件
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void dgMaterialContextImport2Dept_Click(object sender, RoutedEventArgs e)
 		{
 			List<Material> lstSelectedMat = [.. dgMaterial.SelectedItems.Cast<Material>()];
@@ -468,6 +534,15 @@ namespace Nimaime.SPD
 
 		#region TAB 02 消耗查询
 		#region TAB 02-01 消耗报表
+		/// <summary>
+		/// 载入科室到ComboBox（用于消耗报表的查询参数选择）
+		/// </summary>
+		private async void LoadDeptToCB()
+		{
+			List<Department> depts = await DepartmentMethods.GetAllDepartments();
+			cbDeptInConsume.ItemsSource = depts;
+		}
+
 		/// <summary>
 		/// 一键设置为上一个财务月
 		/// </summary>

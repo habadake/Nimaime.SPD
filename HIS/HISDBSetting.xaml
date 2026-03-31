@@ -21,27 +21,24 @@
 		<hc:ComboBox Grid.Row="0" Name="cbDbServer"
 				hc:InfoElement.TitlePlacement="Left"
 				hc:InfoElement.Title="地址"
-				hc:InfoElement.Necessary="True"
 				DisplayMemberPath="Name"
 				SelectedValuePath="Value"/>
 
 		<!-- 用户名 -->
 		<TextBox Grid.Row="1" Name="txtDbUser"
-				VerticalAlignment="Center"
-				hc:InfoElement.TitlePlacement="Left"
-				hc:InfoElement.Title="账号"
-				hc:InfoElement.Necessary="True"
-				Style="{StaticResource TextBoxExtend}"
-				Margin="0,5,0,0"/>
+						 VerticalAlignment="Center"
+						 hc:InfoElement.TitlePlacement="Left"
+						 hc:InfoElement.Title="账号"
+						 Style="{StaticResource TextBoxExtend}"
+						 Margin="0,5,0,0"/>
 
 		<!-- 密码 -->
 		<PasswordBox Grid.Row="2" Name="txtDbPassword"
-				VerticalAlignment="Center"
-				hc:InfoElement.TitlePlacement="Left"
-				hc:InfoElement.Title="密码"
-				hc:InfoElement.Necessary="True"
-				Style="{StaticResource PasswordBoxExtend}"
-				Margin="0,5,0,0"/>
+								 VerticalAlignment="Center"
+								 hc:InfoElement.TitlePlacement="Left"
+								 hc:InfoElement.Title="密码"
+								 Style="{StaticResource PasswordBoxExtend}"
+								 Margin="0,5,0,0"/>
 
 		<!-- 保存按钮 -->
 		<Grid Grid.Row="4">
@@ -52,17 +49,18 @@
 			</Grid.ColumnDefinitions>
 
 			<Button Grid.Column="1"
-				Name="btnTest"
-				Content="测试连接"
-				Width="100"
-				Margin="0,0,5,0"
-				Click="BtnTest_Click"/>
+							Name="btnTest"
+							Content="测试连接"
+							Width="100"
+							Margin="0,0,5,0"
+							Click="BtnTest_Click"/>
 
 			<Button Grid.Column="2"
-				Name="btnSave"
-				Content="保存"
-				Width="100"
-				Click="BtnSave_Click"/>
+							Name="btnSave"
+							Content="保存"
+							Width="100"
+							Style="{StaticResource ButtonSuccess}"
+							Click="BtnSave_Click"/>
 		</Grid>
 	</Grid>
 </Window>

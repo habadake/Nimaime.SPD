@@ -38,7 +38,10 @@
 			<Button Grid.Column="1" Name="btnAddDept2CB" Content="按关键字添加科室" Click="btnAddDept2CB_Click" Margin="5,0,0,0"/>
 		</Grid>
 		<StackPanel Grid.Row="2" HorizontalAlignment="Right" Margin="0,5,0,0">
-			<Button Name="btnImport2Dept" HorizontalAlignment="Right" Click="btnImport2Dept_Click">
+			<Button 
+				Name="btnImport2Dept"
+				HorizontalAlignment="Right"
+				Click="btnImport2Dept_Click">
 				<Label Content="将{0}个耗材导入{1}个科室" Name="lblHint"/>
 			</Button>
 		</StackPanel>

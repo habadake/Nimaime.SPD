@@ -6,7 +6,7 @@
 				xmlns:local="clr-namespace:Nimaime.SPD"
 				xmlns:hc="https://handyorg.github.io/handycontrol"
 				mc:Ignorable="d"
-				Title="登录" Height="150" Width="360"
+				Title="登录" Height="180" Width="360"
 				ResizeMode="NoResize">
 	<Grid Margin="5">
 		<Grid.RowDefinitions>
@@ -21,16 +21,14 @@
 			<TextBox Name="txtAccount" VerticalAlignment="Center"
 							 hc:InfoElement.TitlePlacement="Left"
 							 hc:InfoElement.Title="账号"
-							 Style="{StaticResource TextBoxExtend}"
-							/>
+							 Style="{StaticResource TextBoxExtend}"/>
 		</Grid>
 		<!--PASSWORD-->
 		<Grid Grid.Row="1" Margin="0,5,0,0">
 			<PasswordBox Name="txtPassword" VerticalAlignment="Center"
 									 hc:InfoElement.TitlePlacement="Left"
 									 hc:InfoElement.Title="密码"
-									 Style="{StaticResource PasswordBoxExtend}"
-									/>
+									 Style="{StaticResource PasswordBoxExtend}"/>
 		</Grid>
 		<!--REMEMBER PASSWORD-->
 		<Grid Grid.Row="2" Margin="0,5,0,0">
@@ -43,7 +41,13 @@
 				<ColumnDefinition Width="Auto"/>
 			</Grid.ColumnDefinitions>
 			<ComboBox Grid.Column="0" Name="cbSPDURL" HorizontalAlignment="Stretch" IsEditable="False" Margin="0,0,5,0" DisplayMemberPath="Name" SelectedValuePath="Url"/>
-			<Button Grid.Column="1" Name="btnLogin" Content="登录" HorizontalAlignment="Right" VerticalAlignment="Center" Click="BtnLogin_Click" Width="80"/>
+			<Button 
+				Grid.Column="1"
+				Name="btnLogin"
+				Content="登录"
+				HorizontalAlignment="Right"
+				Style="{StaticResource ButtonSuccess}"
+				Click="BtnLogin_Click" Width="80"/>
 		</Grid>
 	</Grid>
 </Window>

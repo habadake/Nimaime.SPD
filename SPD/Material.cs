@@ -184,7 +184,7 @@ namespace Nimaime.SPD.SPD
 		public string medicalOnlinePay { get; set; }
 
 		public string extInt2 { get; set; }
-		public string extInt3 { get; set; }
+		public int? extInt3 { get; set; }
 		public string extInt5 { get; set; }
 		public string extInt6 { get; set; }
 		public int? extInt7 { get; set; }
@@ -250,7 +250,7 @@ namespace Nimaime.SPD.SPD
 		/// </summary>
 		/// <param name="para">查询参数</param>
 		/// <returns>耗材列表</returns>
-		public static async Task<List<Material>> GetSPDMaterialList(SPDMaterialParameter para)
+		public static async Task<(List<Material>, int)> GetSPDMaterialList(SPDMaterialParameter para)
 		{
 			return await GetSPDMaterialList(para, page: 1, rows: 5000);
 		}
@@ -261,8 +261,8 @@ namespace Nimaime.SPD.SPD
 		/// <param name="para">查询参数</param>
 		/// <param name="page">页码（从1开始）</param>
 		/// <param name="rows">每页行数</param>
-		/// <returns>耗材列表</returns>
-		public static async Task<List<Material>> GetSPDMaterialList(SPDMaterialParameter para, int page, int rows)
+		/// <returns>耗材列表和总页数</returns>
+		public static async Task<(List<Material>, int)> GetSPDMaterialList(SPDMaterialParameter para, int page, int rows)
 		{
 			GetMaterialRequest request = new()
 			{
@@ -280,13 +280,14 @@ namespace Nimaime.SPD.SPD
 				);
 
 				ApiResponse<PagedResult<Material>>? result = JsonSerializer.Deserialize<ApiResponse<PagedResult<Material>>>(response, JSOptionConverterMaker.Option);
-
-				return result?.data?.data ?? [];
+				int total = result?.data?.total ?? 0;
+				int pageCount = (int)Math.Ceiling((double)total / rows);
+				return (result?.data?.data ?? [], pageCount);
 			}
 			catch (Exception ex)
 			{
 				MessageBox.Show($"加载耗材失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-				return [];
+				return ([], 0);
 			}
 		}
 
