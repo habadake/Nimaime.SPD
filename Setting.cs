@@ -14,7 +14,15 @@ namespace Nimaime.SPD
 		/// <summary>
 		/// 当前选中的服务器对象
 		/// </summary>
-		public SPDWebAddr SelectedSPDWebAddr { get { return SPDWebAddrs[SelectedSPDWebAddrIndex]; } }
+		public SPDWebAddr SelectedSPDWebAddr
+		{
+			get
+			{
+				if (SelectedSPDWebAddrIndex < SPDWebAddrs.Count && SelectedSPDWebAddrIndex >= 0)
+					return SPDWebAddrs[SelectedSPDWebAddrIndex];
+				return new("", "");
+			}
+		}
 		/// <summary>
 		/// 当前选中的服务器WEB URL
 		/// </summary>
@@ -147,7 +155,17 @@ namespace Nimaime.SPD
 		/// <summary>
 		/// 当前选定的HIS数据库地址对象
 		/// </summary>
-		public HISDbAddr SelectedHISDbAddr { get { return HISDbAddrs[SelectedHISDbAddrIndex]; } }
+		public HISDbAddr SelectedHISDbAddr
+		{
+			get
+			{
+				if (SelectedHISDbAddrIndex < HISDbAddrs.Count && SelectedHISDbAddrIndex >= 0)
+				{
+					return HISDbAddrs[SelectedHISDbAddrIndex];
+				}
+				return new HISDbAddr("", "", "");
+			}
+		}
 		/// <summary>
 		/// 可用HIS数据库地址列表（名称和URL）
 		/// </summary>

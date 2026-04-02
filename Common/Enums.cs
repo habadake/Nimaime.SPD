@@ -6,6 +6,9 @@ namespace Nimaime.SPD.Common
 {
 	public class Enums
 	{
+		/// <summary>
+		/// 翻页数量
+		/// </summary>
 		public enum CountPerPage
 		{
 			每页100个 = 100,
@@ -13,6 +16,16 @@ namespace Nimaime.SPD.Common
 			每页500个 = 500,
 			每页1000个 = 1000,
 			无视卡机全部加载 = 99999999
+		}
+
+		/// <summary>
+		/// 耗材管理类型
+		/// </summary>
+		public enum MaterialType
+		{
+			低值 = 10,
+			高值 = 20,
+			试剂 = 60,
 		}
 	}
 }

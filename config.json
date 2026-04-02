@@ -1,0 +1,27 @@
+{
+  "SelectedSPDWebAddr": {
+    "Name": "",
+    "Url": ""
+  },
+  "BaseUrl": "",
+  "Account": "",
+  "Password": "",
+  "RememberPassword": false,
+  "XUS": "",
+  "XAuth": "",
+  "LoginName": "",
+  "LastLoginTime": "0001-01-01T00:00:00",
+  "SPDWebAddrs": [],
+  "SelectedSPDWebAddrIndex": 0,
+  "HISDbConfig": {
+    "UserName": "",
+    "Password": "",
+    "SelectedHISDbAddr": {
+      "Name": "",
+      "IP": "",
+      "Port": ""
+    },
+    "HISDbAddrs": [],
+    "SelectedHISDbAddrIndex": 0
+  }
+}

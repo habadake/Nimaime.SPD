@@ -40,6 +40,10 @@ namespace Nimaime.SPD.SPD
 	/// </summary>
 	public static class ProviderMethods
 	{
+		/// <summary>
+		/// 获取全部供应商
+		/// </summary>
+		/// <returns></returns>
 		public static async Task<List<Provider>> GetProviders()
 		{
 			SPDHTTP spdHTTP = new();
