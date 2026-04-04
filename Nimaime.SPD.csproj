@@ -9,8 +9,8 @@
     <Platforms>x64</Platforms>
     <ApplicationIcon>gyqx_favicon.ico</ApplicationIcon>
     <AssemblyTitle>二枚目国药SPD系统帮助程序</AssemblyTitle>
-    <AssemblyVersion>0.2.109.9588</AssemblyVersion>
-    <FileVersion>0.2.109.9588</FileVersion>
+    <AssemblyVersion>0.2.115.9589</AssemblyVersion>
+    <FileVersion>0.2.115.9589</FileVersion>
     <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
   </PropertyGroup>
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using Nimaime.SPD.Common;
 using Nimaime.SPD.SPD;
+using Nimaime.SPD.SPD.FormWindow;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
@@ -11,6 +12,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Windows.ApplicationModel;
+using static Nimaime.SPD.Common.Enums;
 using static Nimaime.SPD.SPD.MaterialMethods;
 
 namespace Nimaime.SPD.Controls
@@ -25,9 +27,12 @@ namespace Nimaime.SPD.Controls
 			InitializeComponent();
 			cbMaterialDGPager.ItemsSource = Enum.GetNames<Enums.CountPerPage>();
 			cbMaterialDGPager.SelectedIndex = 0;
+			cbMaterialType.ItemsSource = Enum.GetNames<Enums.MaterialType>();
+			cbMaterialType.SelectedIndex = 0;
 			LoadProviderToCB();
 		}
 
+		#region 页面控制
 		private int currentDGMatPage = -1;
 		private int currentDGMatPageCount = -1;
 		private ContextMenu menuDGMaterial { get; set; }
@@ -41,7 +46,6 @@ namespace Nimaime.SPD.Controls
 			UpdateMatPage(1);
 		}
 
-		#region 页面控制
 		/// <summary>
 		/// 首页
 		/// </summary>
@@ -173,6 +177,7 @@ namespace Nimaime.SPD.Controls
 		/// <returns></returns>
 		private SPDMaterialParameter GenMaterialParaByUI()
 		{
+			MaterialType type = Enum.Parse<MaterialType>(cbMaterialType.SelectedItem?.ToString() ?? "不区分");
 			SPDMaterialParameter para = new()
 			{
 				goodsName = !string.IsNullOrWhiteSpace(txtKeyword.Text) ? txtKeyword.Text.Trim() : "",
@@ -183,6 +188,7 @@ namespace Nimaime.SPD.Controls
 				tempPurchase = chkIsMaterialTemporaryProcurement.IsChecked == true ? "1" : chkIsMaterialTemporaryProcurement.IsChecked == false ? "0" : "",
 				charging = chkIsMaterialCharging.IsChecked == true ? "1" : chkIsMaterialCharging.IsChecked == false ? "0" : "",
 				purchaseContract = chkIsMaterialContract.IsChecked == true ? "1" : chkIsMaterialContract.IsChecked == false ? "2" : "",
+				purMode = (int)type > 0 ? ((int)type).ToString(): ""
 			};
 			return para;
 		}
@@ -375,6 +381,14 @@ namespace Nimaime.SPD.Controls
 			};
 			dgMaterialContextImport2Dept.Click += dgMaterialContextImport2Dept_Click;
 			menuDGMaterial.Items.Add(dgMaterialContextImport2Dept);
+
+			MenuItem dgMaterialZBDateADJ = new()
+			{
+				Header = "调整中标日期",
+			};
+			dgMaterialZBDateADJ.Click += DgMaterialZBDateADJ_Click;
+			menuDGMaterial.Items.Add(dgMaterialZBDateADJ);
+
 			menuDGMaterial.StaysOpen = true;
 			menuDGMaterial.IsOpen = true;
 		}
@@ -388,6 +402,18 @@ namespace Nimaime.SPD.Controls
 		{
 			List<Material> lstSelectedMat = [.. dgMaterial.SelectedItems.Cast<Material>()];
 			ImportMaterial2Dept window = new(lstSelectedMat);
+			window.ShowDialog();
+		}
+
+		/// <summary>
+		/// 填写招标日期变更表单
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void DgMaterialZBDateADJ_Click(object sender, RoutedEventArgs e)
+		{
+			List<Material> lstSelectedMat = [.. dgMaterial.SelectedItems.Cast<Material>()];
+			AddZBDateADJBill window = new(lstSelectedMat);
 			window.ShowDialog();
 		}
 	}

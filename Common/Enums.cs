@@ -23,6 +23,7 @@ namespace Nimaime.SPD.Common
 		/// </summary>
 		public enum MaterialType
 		{
+			不区分 = 0,
 			低值 = 10,
 			高值 = 20,
 			试剂 = 60,

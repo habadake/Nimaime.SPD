@@ -26,7 +26,7 @@
 								hc:InfoElement.Title="关键词"
 								Style="{StaticResource TextBoxExtend}"
 								x:Name="txtKeyword" Width="120"/>
-				<ComboBox Margin="5,0,0,0"
+				<local:SearchableComboBox Margin="5,0,0,0"
 								ItemsSource="{Binding Providers, Mode=OneWay}"
 								hc:InfoElement.TitlePlacement="Left"
 								hc:InfoElement.Title="供应商"
@@ -45,7 +45,7 @@
 					hc:InfoElement.Title="类型"
 					Style="{StaticResource ComboBoxExtend}"
 					x:Name="cbMaterialType"
-					Width="100"/>
+					Width="120"/>
 				<CheckBox Margin="5,0,0,0" x:Name="chkIsMaterialEnabled" Content="是否激活" IsThreeState="True" IsChecked="True"/>
 				<CheckBox Margin="5,0,0,0" x:Name="chkIsMaterialProcurement" Content="是否采购" IsThreeState="True" IsChecked="{x:Null}"/>
 				<CheckBox Margin="5,0,0,0" x:Name="chkIsMaterialTemporaryProcurement" Content="是否临采" IsThreeState="True" IsChecked="{x:Null}"/>

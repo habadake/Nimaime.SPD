@@ -10,19 +10,19 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace Nimaime.SPD.SPD
+namespace Nimaime.SPD.SPD.FormWindow
 {
 	/// <summary>
 	/// ImportMaterial2Dept.xaml 的交互逻辑
 	/// </summary>
 	public partial class ImportMaterial2Dept : Window
 	{
-		private List<Material> Materials2Import = [];
+		private List<Material> Materials = [];
 		public ImportMaterial2Dept(List<Material> materials2Import)
 		{
 			InitializeComponent();
-			Materials2Import = materials2Import;
-			lblHint.Content = $"将 {Materials2Import.Count} 个耗材导入 {cbDept2Imp.SelectedItems.Count} 个科室";
+			Materials = materials2Import;
+			lblHint.Content = $"将 {Materials.Count} 个耗材导入 {cbDept2Imp.SelectedItems.Count} 个科室";
 			LoadDeptToCombo();
 		}
 
@@ -51,7 +51,7 @@ namespace Nimaime.SPD.SPD
 		/// <param name="e"></param>
 		private void cbDept2Imp_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			lblHint.Content = $"将 {Materials2Import.Count} 个耗材导入 {cbDept2Imp.SelectedItems.Count} 个科室";
+			lblHint.Content = $"将 {Materials.Count} 个耗材导入 {cbDept2Imp.SelectedItems.Count} 个科室";
 			if (cbDept2Imp.SelectedItems.Count > 0)
 			{
 				btnImport2Dept.IsEnabled = true;
@@ -70,7 +70,7 @@ namespace Nimaime.SPD.SPD
 		private async void btnImport2Dept_Click(object sender, RoutedEventArgs e)
 		{
 			List<Department> departments = [.. cbDept2Imp.SelectedItems.Cast<Department>()];
-			await MaterialMethods.ImportMaterial2Dept(Materials2Import, departments);
+			await MaterialMethods.ImportMaterial2Dept(Materials, departments);
 		}
 
 		/// <summary>
