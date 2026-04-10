@@ -79,15 +79,10 @@
 									</Grid.RowDefinitions>
 									<Grid Grid.Row="0">
 										<StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-											<StackPanel.Resources>
-												<Style TargetType="Button">
-													<Setter Property="Margin" Value="5,0,0,0"/>
-												</Style>
-											</StackPanel.Resources>
 											<Label Content="唯一码："/>
 											<TextBox x:Name="txtEPC" Width="128"/>
-											<Button Name="btnTrackEPC" Content="查询" Click="btnTrackEPC_Click"/>
-											<Button Name="btnTrackEPCByExcel" Content="表格批量查询" Click="btnTrackEPCByExcel_Click"/>
+											<Button Name="btnTrackEPC" Content="查询" Click="btnTrackEPC_Click" Margin="5,0,0,0"/>
+											<Button Name="btnTrackEPCByExcel" Content="表格批量查询" Click="btnTrackEPCByExcel_Click" Margin="5,0,0,0"/>
 										</StackPanel>
 									</Grid>
 								</Grid>
