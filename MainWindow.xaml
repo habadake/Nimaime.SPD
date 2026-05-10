@@ -25,6 +25,7 @@
 				<Label Content="当前登录用户：未登录(双击此处登录)" HorizontalAlignment="Left" Name="lblLoginStatus" MouseDoubleClick="lblLoginStatus_MouseDoubleClick"/>
 			</StackPanel>
 			<StackPanel Grid.Column="2" Orientation="Horizontal">
+				<Button Name="btnSPDDBSetting" Content="SPD数据库设置" HorizontalAlignment="Right" Click="btnSPDDBSetting_Click" Margin="5,0,0,0"/>
 				<Button Name="btnHISDBSetting" Content="HIS数据库设置" HorizontalAlignment="Right" Click="btnHISDBSetting_Click" Margin="5,0,0,0"/>
 				<Button Name="btnLogout" Content="注销" HorizontalAlignment="Right" Click="btnLogout_Click" Style="{StaticResource ButtonDanger}" Margin="5,0,0,0"/>
 			</StackPanel>

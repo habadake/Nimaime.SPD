@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using Nimaime.Helper.File;
 using Nimaime.SPD.Common;
 using Nimaime.SPD.SPD;
 using Nimaime.SPD.SPD.FormWindow;
@@ -7,6 +8,7 @@ using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -102,9 +104,9 @@ namespace Nimaime.SPD.Controls
 				btnDGMatNextPage.IsEnabled = false;
 				btnLoadMaterial.Content = "加载中...";
 
-				SPDMaterialParameter para = GenMaterialParaByUI();
+				SPDMaterialParameterByWebAPI para = GenMaterialParaByUI();
 				Enums.CountPerPage enumPageCount = Enum.Parse<Enums.CountPerPage>(cbMaterialDGPager.SelectedItem.ToString() ?? "每页100个");
-				(List<Material> materials, currentDGMatPageCount, int totalCount) = await MaterialMethods.GetSPDMaterialList(para, page2Load, (int)enumPageCount);
+				(List<Material> materials, currentDGMatPageCount, int totalCount) = await MaterialMethods.GetSPDMaterialListByWebAPI(para, page2Load, (int)enumPageCount);
 				if (currentDGMatPageCount > 0)
 				{
 					btnDGMatFirstPage.IsEnabled = currentDGMatPageCount > 1 && page2Load != 1;
@@ -157,7 +159,7 @@ namespace Nimaime.SPD.Controls
 				btnExportMaterialWithPara.IsEnabled = true;
 				return;
 			}
-			SPDMaterialParameter exPara = GenMaterialParaByUI();
+			SPDMaterialParameterByWebAPI exPara = GenMaterialParaByUI();
 			// 下载报表文件
 			bool result = await MaterialMethods.ExportSPDMaterialWithPara(saveFileDialog.FileName, exPara);
 			if (result)
@@ -175,10 +177,10 @@ namespace Nimaime.SPD.Controls
 		/// 设置查询参数
 		/// </summary>
 		/// <returns></returns>
-		private SPDMaterialParameter GenMaterialParaByUI()
+		private SPDMaterialParameterByWebAPI GenMaterialParaByUI()
 		{
 			MaterialType type = Enum.Parse<MaterialType>(cbMaterialType.SelectedItem?.ToString() ?? "不区分");
-			SPDMaterialParameter para = new()
+			SPDMaterialParameterByWebAPI para = new()
 			{
 				goodsName = !string.IsNullOrWhiteSpace(txtKeyword.Text) ? txtKeyword.Text.Trim() : "",
 				provId = cbProviderInMaterial.SelectedValue is Provider selectedProvider ? selectedProvider.provId : "",
@@ -201,7 +203,6 @@ namespace Nimaime.SPD.Controls
 		private async void btnExportMaterialXLS_Click(object sender, RoutedEventArgs e)
 		{
 			bool exportDisabled = false;
-			bool combine = false;
 			btnExportMaterialXLS.IsEnabled = false;
 			MessageBoxResult r;
 			r = MessageBox.Show("是否导出停用耗材？", "提示", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.No);
@@ -214,145 +215,35 @@ namespace Nimaime.SPD.Controls
 				btnExportMaterialXLS.IsEnabled = true;
 				return;
 			}
-			if (!exportDisabled)
-			{
-				combine = false;
-			}
-			else
-			{
-				r = MessageBox.Show("是否合并为一个Excel文件输出", "提示", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes);
-				if (r == MessageBoxResult.Yes)
-				{
-					combine = true;
-				}
-				else
-				{
-					combine = false;
-				}
-			}
+			string tableName = $"医院商品导出表_{DateTime.Now:yyyy-MM-dd}";
 			SaveFileDialog saveFileDialog = new()
 			{
 				Title = "保存SPD物资信息",
-				Filter = "Excel 97-2003 工作簿 (*.xls)|*.xls",
-				FileName = $"医院商品导出表{DateTime.Now:yyyy-MM-dd}.xls"
+				Filter = "Excel 工作簿 (*.xlsx)|*.xlsx",
+				FileName = $"{tableName}.xlsx"
 			};
 			if (saveFileDialog.ShowDialog() != true)
 			{
 				btnExportMaterialXLS.IsEnabled = true;
 				return;
 			}
-			string fileDic = Path.GetDirectoryName(saveFileDialog.FileName) ?? "";
-			if (!Path.Exists(fileDic))
+			SPDMaterialParameterByDB paraDB = new()
 			{
-				btnExportMaterialXLS.IsEnabled = true;
+				enabled = exportDisabled ? null : true,
+			};
+			DataTable? result = await MaterialMethods.GetMaterialByDB(paraDB);
+			btnExportMaterialXLS.IsEnabled = true;
+			if (result == null)
+			{
 				return;
 			}
-			string fileNameWithoutExt = Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
-			string filePathEnabled = Path.Combine(fileDic, fileNameWithoutExt + "_启用" + Path.GetExtension(saveFileDialog.FileName));
-			string filePathDisabled = Path.Combine(fileDic, fileNameWithoutExt + "_停用" + Path.GetExtension(saveFileDialog.FileName));
-			string filePathCombined = Path.Combine(fileDic, fileNameWithoutExt + "_全量" + ".xlsx");
-			SPDMaterialParameter parameter = new()
+			result.TableName = tableName;
+			ExcelHelper.SaveDataTable2Excel(result, saveFileDialog.FileName);
+			System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
 			{
-				flag = "1",
-			};
-			bool result1 = await MaterialMethods.ExportSPDMaterialWithPara(filePathEnabled, parameter);
-			bool result2 = false;
-			if (exportDisabled)
-			{
-				parameter.flag = "0";
-				result2 = await MaterialMethods.ExportSPDMaterialWithPara(filePathDisabled, parameter);
-			}
-			if (result1 && result2 && combine)
-			{
-				// 合并两个Excel 新增一列是否启用
-				MergeExcel(filePathEnabled, filePathDisabled, filePathCombined);
-				// 删除单独的启用和停用文件
-				try
-				{
-					File.Delete(filePathEnabled);
-					File.Delete(filePathDisabled);
-				}
-				catch
-				{
-					// 无论如何都不影响合并文件的使用体验，所以即使删除失败也不提示用户了
-				}
-			}
-			if (result1 && (result2 || !combine))
-			{
-				MessageBox.Show($"导出成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
-			}
-			btnExportMaterialXLS.IsEnabled = true;
-		}
-
-		/// <summary>
-		/// 合并耗材记录
-		/// </summary>
-		/// <param name="enabledPath">启用表</param>
-		/// <param name="disabledPath">停用表</param>
-		/// <param name="outputPath">输出表</param>
-		private static void MergeExcel(string enabledPath, string disabledPath, string outputPath)
-		{
-			XSSFWorkbook workbook = new();
-			ISheet sheet = workbook.CreateSheet("合并数据");
-
-			int rowIndex = 0;
-
-			// 读取并写入
-			void AppendFile(string path, string flag, bool writeHeader)
-			{
-				using FileStream fs = new(path, FileMode.Open, FileAccess.Read);
-				HSSFWorkbook wb = new(fs);
-				ISheet sh = wb.GetSheetAt(0);
-
-				for (int i = 0; i <= sh.LastRowNum; i++)
-				{
-					IRow sourceRow = sh.GetRow(i);
-					if (sourceRow == null) continue;
-
-					// 表头处理
-					if (i == 0)
-					{
-						if (!writeHeader) continue;
-
-						IRow newRow = sheet.CreateRow(rowIndex++);
-						int colIndex = 0;
-
-						for (int j = 0; j < sourceRow.LastCellNum; j++)
-						{
-							newRow.CreateCell(colIndex++)
-								  .SetCellValue(sourceRow.GetCell(j)?.ToString());
-						}
-
-						// 新增列
-						newRow.CreateCell(colIndex).SetCellValue("是否启用");
-						continue;
-					}
-
-					// 数据行
-					IRow targetRow = sheet.CreateRow(rowIndex++);
-					int targetCol = 0;
-
-					for (int j = 0; j < sourceRow.LastCellNum; j++)
-					{
-						targetRow.CreateCell(targetCol++)
-								 .SetCellValue(sourceRow.GetCell(j)?.ToString());
-					}
-
-					// 新增列值
-					targetRow.CreateCell(targetCol).SetCellValue(flag);
-				}
-			}
-
-			// 先写启用（带表头）
-			AppendFile(enabledPath, "是", true);
-
-			// 再写停用（不写表头）
-			if (File.Exists(disabledPath))
-				AppendFile(disabledPath, "否", false);
-
-			// 保存
-			using FileStream outFs = new(outputPath, FileMode.Create, FileAccess.Write);
-			workbook.Write(outFs);
+				FileName = saveFileDialog.FileName,
+				UseShellExecute = true
+			});
 		}
 
 		/// <summary>

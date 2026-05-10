@@ -69,8 +69,10 @@ namespace Nimaime.SPD.SPD.FormWindow
 		/// <param name="e"></param>
 		private async void btnImport2Dept_Click(object sender, RoutedEventArgs e)
 		{
+			btnImport2Dept.IsEnabled = false;
 			List<Department> departments = [.. cbDept2Imp.SelectedItems.Cast<Department>()];
 			await MaterialMethods.ImportMaterial2Dept(Materials, departments);
+			btnImport2Dept.IsEnabled = true;
 		}
 
 		/// <summary>

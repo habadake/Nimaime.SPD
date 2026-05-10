@@ -6,7 +6,7 @@
 				xmlns:local="clr-namespace:Nimaime.SPD"
 				mc:Ignorable="d"
 				xmlns:hc="https://handyorg.github.io/handycontrol"
-				Title="数据库配置" Height="180" Width="320">
+				Title="HIS数据库配置" Height="180" Width="320">
 
 	<Grid Margin="5">
 		<Grid.RowDefinitions>

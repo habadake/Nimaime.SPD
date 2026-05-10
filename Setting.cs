@@ -83,6 +83,7 @@ namespace Nimaime.SPD
 		/// HIS数据库配置（包含用户名、密码和可选的数据库地址列表）
 		/// </summary>
 		public HISDbConfig HISDbConfig { get; set; } = new();
+		public SPDDbConfig SPDDbConfig { get; set; } = new();
 
 		public Setting()
 		{
@@ -123,6 +124,29 @@ namespace Nimaime.SPD
 	/// <param name="ip"></param>
 	/// <param name="port"></param>
 	public class HISDbAddr(string name, string ip, string port = "1521")
+	{
+		/// <summary>
+		/// 服务器名称
+		/// </summary>
+		public string Name { get; set; } = name;
+		/// <summary>
+		/// WEB URL（必须以/结尾）
+		/// </summary>
+		public string IP { get; set; } = ip;
+		public string Port { get; set; } = port;
+		public override string ToString()
+		{
+			return $"[{Name}] ({IP}:{Port})";
+		}
+	}
+
+	/// <summary>
+	/// SPD数据库地址
+	/// </summary>
+	/// <param name="name"></param>
+	/// <param name="ip"></param>
+	/// <param name="port"></param>
+	public class SPDDbAddr(string name, string ip, string port = "3306")
 	{
 		/// <summary>
 		/// 服务器名称
@@ -200,6 +224,58 @@ namespace Nimaime.SPD
 			try
 			{
 				return await OracleHelper.TestConnectionAsync(this);
+			}
+			catch (Exception ex)
+			{
+				return (false, ex.ToString()); // 连接失败
+			}
+		}
+	}
+
+	public class SPDDbConfig
+	{
+		/// <summary>
+		/// SPD数据库用户名
+		/// </summary>
+		public string UserName { get; set; } = "";
+		/// <summary>
+		/// SPD数据库密码
+		/// </summary>
+		public string Password { get; set; } = "";
+		public SPDDbAddr SelectedSPDDbAddr
+		{
+			get
+			{
+				if (SelectedSPDDbAddrIndex < SPDDbAddrs.Count && SelectedSPDDbAddrIndex >= 0)
+				{
+					return SPDDbAddrs[SelectedSPDDbAddrIndex];
+				}
+				return new SPDDbAddr("", "", "");
+			}
+		}
+		public List<SPDDbAddr> SPDDbAddrs { get; set; } = [];
+		private int _selectedSPDDbAddrIndex { get; set; } = 0;
+		public int SelectedSPDDbAddrIndex
+		{
+			get
+			{
+				return _selectedSPDDbAddrIndex;
+			}
+			set
+			{
+				if (value < 0 || value >= SPDDbAddrs.Count)
+				{
+					_selectedSPDDbAddrIndex = 0;
+					return;
+				}
+				_selectedSPDDbAddrIndex = value;
+			}
+		}
+		public async Task<(bool, string)> TestConnection()
+		{
+			try
+			{
+				return await MySQLHelper.TestConnectionAsync(this);
 			}
 			catch (Exception ex)
 			{

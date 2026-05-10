@@ -140,7 +140,7 @@ namespace Nimaime.SPD
 		}
 
 		/// <summary>
-		/// HIS数据库设置按钮（打开一个新的窗口进行HIS数据库连接配置，配置完成后会自动保存并更新主窗口显示的登录状态）
+		/// HIS数据库设置按钮（打开一个新的窗口进行HIS数据库连接配置）
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
@@ -151,10 +151,22 @@ namespace Nimaime.SPD
 			// 登录后需要重载配置
 			config.Load();
 		}
+
+		/// <summary>
+		/// SPD数据库设置按钮（打开一个新的窗口进行SPD数据库连接配置）
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void btnSPDDBSetting_Click(object sender, RoutedEventArgs e)
+		{
+			SPDDBSetting setting = new();
+			setting.ShowDialog();
+			config.Load();
+		}
 		#endregion
 
 		#region TAB 01 耗材管理
-		
+
 		#endregion
 
 		#region TAB 02 消耗查询
@@ -447,5 +459,5 @@ namespace Nimaime.SPD
 		}
 		#endregion
 
-	}
+    }
 }
