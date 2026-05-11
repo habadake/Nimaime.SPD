@@ -565,7 +565,7 @@ namespace Nimaime.SPD.SPD
 							/* 拼财务分类 */
 							select h_kc.id as '分类ID', h_kc.kind_name as '分类名称' from hos_kindcode h_kc
 						) as kc on hgi.lbsx = kc.分类ID
-						inner join (
+						left join (
 							/* 拼曾用HIS编码*/
 							SELECT
 								HOS_GOODS_ID,
