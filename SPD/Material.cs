@@ -525,86 +525,99 @@ namespace Nimaime.SPD.SPD
 			{
 				string sql = $@"
 					select
-					    /* Columns filter here */
-					    *
+						/* Columns filter here */
+						*
 					from (
-					    select
-					        cast(SUBSTRING_INDEX(hgi.id, '-', -1) as signed)           as '物资ID',
-					        hgi.erp_code                                               as 'HIS编码',
-					        hgi.hit_code                                               as '省平台编码',
-					        IF(hgi.flag = '1', '是', '否')                             as '启用',
-					        IF(contract_info.带量合同ID IS NULL, '否', '是')           as '带量',
-					        IF(hgi.can_purchase = '1', '是', '否')                     as '采购',
-					        IF(hgi.temp_purchase = '1', '是', '否')                    as '临采',
-					        case hgi.pur_mode when 10 then '低值' when 20 then '高值' when 60 then '试剂'
-					        else '未知'                                               end as '物资类型',
-					        kc.分类名称                                                as '财务分类',
-					        hgi.goods_name                                             as '名称',
-					        hgi.goods_gg                                               as '规格',
-					        0+cast(hgi.price as char)                                  as '单价',
-					        hgi.unit                                                   as '单位',
-					        IF(hgi.charging = '1', '是', '否')                         as '是否收费',
-					        company_info.名称                                          as '供应商',
-					        hgi.hos_mfrs_name                                          as '厂家',
-					        pgi_s.注册证号                                             as '注册证号',
-					        hgi.icd_code                                               as '医保编码(27位)',
-					        hgie.是否十八类                                            as '是否十八类',
-					        kind18_dict.十八类具体项                                   as '十八类具体项',
-					        DATE_FORMAT(hgi.ext_datetime2, '%Y-%m-%d')                 as '院内招标时间',
-					        DATE_FORMAT(hgi.fill_date, '%Y-%m-%d %H:%i:%S')            as '录入时间',
-					        DATE_FORMAT(hgi.last_update_datetime, '%Y-%m-%d %H:%i:%S') as '最后更新时间',
-					        hgi.remark                                                 as '备注'
-					    from hos_goods_info hgi
-					    inner join (
-					        /* 拼供应商名称 */
-					        select id as '供应商ID', cname as '名称' from bas_company_info
-					    ) company_info on hgi.prov_id = company_info.供应商ID
-					    /* The category code should match the code defined in hos_kindcode */
-					    inner join (
-					        /* 拼财务分类 */
-					        select h_kc.id as '分类ID', h_kc.kind_name as '分类名称' from hos_kindcode h_kc
-					    ) as kc on hgi.lbsx = kc.分类ID
-					    left join (
-					        /* 拼带量 */
-					        select hcil.hos_goods_id as '物资ID',
-					               hc.id             as '带量合同ID',
-					               hc.begin_date     as '合同开始时间',
-					               hc.end_date       as '合同结束时间'
-					        from hos_contract_item_list hcil
-					        inner join hos_contract hc on hcil.contract_id = hc.id
-					        where hc.status = '20' and now() >= hc.begin_date
-					        and (hc.end_date is null or now() <= hc.end_date)
-					    ) as contract_info on hgi.hos_id = contract_info.物资ID
-					    /* Should be left join here because not all hosGoodId has an extra record */
-					    left join (
-					        /* 拼扩展 */
-					        select hgi_ext.goods_id as '物资ID',
-					               IF(hgi_ext.kind18 = '1', '是', '否') as '是否十八类',
-					               hgi_ext.kind18_content as '十八类编号'
-					        from hos_goods_info_ext hgi_ext
-					    ) as hgie on hgi.id = hgie.物资ID
-					    left join (
-					        /* 十八类字典 */
-					        select sdv.dict_id as '字典ID',
-					               sdv.val     as '十八类编号',
-					               sdv.ename   as '十八类具体项'
-					        from sys_dict_value as sdv
-					        /* kind18 dictionary */
-					        where sdv.dict_id = 'kind18'
-					    ) as kind18_dict on hgie.十八类编号 = kind18_dict.十八类编号
-					    /* Not every hosGood has a certificate */
-					    left join (
-					        /* 注册证 */
-					        select pgi.erp_code as 'ERP编码',
-					               pgi.prov_id as '供应商ID',
-					               pgi.certificate_code as '注册证号'
-					        from prov_goods_info pgi
-					    /* A hosGoodId can match multiple records in prov_goods_info due to each provider has a unique erpCode */
-					    ) as pgi_s on hgi.code = pgi_s.ERP编码 and hgi.prov_id = pgi_s.供应商ID
-					    /*
-					    all where clause should be here
-					    */
-					    {para}
+						select
+							cast(SUBSTRING_INDEX(hgi.id, '-', -1) as signed)           as '物资ID',
+							hgi.erp_code                                               as 'HIS编码',
+							hgi.hit_code                                               as '省平台编码',
+							IF(hgi.flag = '1', '是', '否')                             as '启用',
+							IF(contract_info.带量合同ID IS NULL, '否', '是')           as '带量',
+							IF(hgi.can_purchase = '1', '是', '否')                     as '采购',
+							IF(hgi.temp_purchase = '1', '是', '否')                    as '临采',
+							hgi.goods_name                                             as '名称',
+							hgi.goods_gg                                               as '规格',
+							case hgi.pur_mode when 10 then '低值' when 20 then '高值' when 60 then '试剂'
+							else '未知'                                               end as '物资类型',
+							kc.分类名称                                                as '财务分类',
+							0+cast(hgi.price as char)                                  as '单价',
+							hgi.unit                                                   as '单位',
+							IF(hgi.charging = '1', '是', '否')                         as '是否收费',
+							company_info.名称                                          as '供应商',
+							hgi.hos_mfrs_name                                          as '厂家',
+							pgi_s.注册证号                                             as '注册证号',
+							hgi.icd_code                                               as '医保编码(27位)',
+							hgie.是否十八类                                            as '是否十八类',
+							kind18_dict.十八类具体项                                   as '十八类具体项',
+							DATE_FORMAT(hgi.ext_datetime2, '%Y-%m-%d')                 as '院内招标时间',
+							DATE_FORMAT(hgi.fill_date, '%Y-%m-%d %H:%i:%S')            as '录入时间',
+							DATE_FORMAT(hgi.last_update_datetime, '%Y-%m-%d %H:%i:%S') as '最后更新时间',
+							his_code_chg.曾用HIS编码                                    as '曾用HIS编码',
+							hgi.remark                                                 as '备注'
+						from hos_goods_info hgi
+						inner join (
+							/* 拼供应商名称 */
+							select id as '供应商ID', cname as '名称' from bas_company_info
+						) company_info on hgi.prov_id = company_info.供应商ID
+						/* The category code should match the code defined in hos_kindcode */
+						inner join (
+							/* 拼财务分类 */
+							select h_kc.id as '分类ID', h_kc.kind_name as '分类名称' from hos_kindcode h_kc
+						) as kc on hgi.lbsx = kc.分类ID
+						inner join (
+							/* 拼曾用HIS编码*/
+							SELECT
+								HOS_GOODS_ID,
+								GROUP_CONCAT(OLD_VALUE ORDER BY OLD_VALUE) AS '曾用HIS编码'
+							FROM hos_goods_chg_sub hgcs
+							WHERE
+							hgcs.BILL_ID IN (SELECT hgcm.ID FROM hos_goods_chg_main hgcm WHERE hgcm.MAINTAIN_STATUS = 60 and hgcm.STATUS = 30)
+							AND hgcs.OLD_VALUE IS NOT NULL AND hgcs.OLD_VALUE != hgcs.NEW_VALUE
+							GROUP BY hgcs.HOS_GOODS_ID
+						) as his_code_chg on hgi.id = his_code_chg.HOS_GOODS_ID
+						left join (
+							/* 拼带量 */
+							select hcil.hos_goods_id as '物资ID',
+								   hc.id             as '带量合同ID',
+								   hc.begin_date     as '合同开始时间',
+								   hc.end_date       as '合同结束时间'
+							from hos_contract_item_list hcil
+							inner join hos_contract hc on hcil.contract_id = hc.id
+							where hc.status = '20' and now() >= hc.begin_date
+							and (hc.end_date is null or now() <= hc.end_date)
+						) as contract_info on hgi.hos_id = contract_info.物资ID
+						/* Should be left join here because not all hosGoodId has an extra record */
+						left join (
+							/* 拼扩展 */
+							select hgi_ext.goods_id as '物资ID',
+								   IF(hgi_ext.kind18 = '1', '是', '否') as '是否十八类',
+								   hgi_ext.kind18_content as '十八类编号'
+							from hos_goods_info_ext hgi_ext
+						) as hgie on hgi.id = hgie.物资ID
+						left join (
+							/* 十八类字典 */
+							select sdv.dict_id as '字典ID',
+								   sdv.val     as '十八类编号',
+								   sdv.ename   as '十八类具体项'
+							from sys_dict_value as sdv
+							/* kind18 dictionary */
+							where sdv.dict_id = 'kind18'
+						) as kind18_dict on hgie.十八类编号 = kind18_dict.十八类编号
+						/* Not every hosGood has a certificate */
+						left join (
+							/* 注册证 */
+							select pgi.erp_code as 'ERP编码',
+								   pgi.prov_id as '供应商ID',
+								   pgi.certificate_code as '注册证号',
+								   pgi.spd_goods_code as '平台物资编码'
+							from prov_goods_info pgi
+						/* A hosGoodId can match multiple records in prov_goods_info due to each provider has a unique erpCode */
+						) as pgi_s on hgi.code = pgi_s.ERP编码 and hgi.prov_id = pgi_s.供应商ID and pgi_s.平台物资编码 = concat('good-', hgi.spd_goods_code)
+						/*
+						all where clause should be here
+						*/
+						{para}
 					) as final_result
 					/* final result filter where clause here */
 					order by final_result.物资ID;
