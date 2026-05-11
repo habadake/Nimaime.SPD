@@ -586,7 +586,7 @@ namespace Nimaime.SPD.SPD
 							inner join hos_contract hc on hcil.contract_id = hc.id
 							where hc.status = '20' and now() >= hc.begin_date
 							and (hc.end_date is null or now() <= hc.end_date)
-						) as contract_info on hgi.hos_id = contract_info.物资ID
+						) as contract_info on hgi.id = contract_info.物资ID
 						/* Should be left join here because not all hosGoodId has an extra record */
 						left join (
 							/* 拼扩展 */
